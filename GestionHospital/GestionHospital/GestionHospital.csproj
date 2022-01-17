@@ -253,6 +253,16 @@
     <Content Include="Scripts\jquery-3.4.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.4.1.min.map" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GestionHospital.Logica\GestionHospital.Logica.csproj">
+      <Project>{76676412-3B96-4C3B-87C8-CC8D88D50A99}</Project>
+      <Name>GestionHospital.Logica</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GestionHospital.Model.Shared\GestionHospital.Model.Shared.csproj">
+      <Project>{CE613005-9223-4452-87A6-C789DFC30B79}</Project>
+      <Name>GestionHospital.Model.Shared</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

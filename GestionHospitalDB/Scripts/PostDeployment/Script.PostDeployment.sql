@@ -12,6 +12,6 @@ Plantilla de script posterior a la implementación
 
 SET IDENTITY_INSERT dbo.Usuario ON
 
-IF NOT EXISTS (SELECT 1 FROM dbo.Usuario WHERE us_id_usuario = 1) INSERT INTO dbo.Usuario (us_id_usuario, us_login) VALUES(1,'1')
+IF NOT EXISTS (SELECT 1 FROM dbo.Usuario WHERE IdUsuario = 1) INSERT INTO dbo.Usuario (IdUsuario, Login) VALUES(1,'1')
 
 SET IDENTITY_INSERT dbo.Usuario OFF

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GestionHospital.Logica;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -10,6 +11,10 @@ namespace GestionHospital.Controllers
     {
         public ActionResult Index()
         {
+            SeguridadCore objSeguridad = new SeguridadCore();
+
+            var usuarios = objSeguridad.ConsultarUsuarios();
+
             return View();
         }
 

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <Name>GestionHospitalBD</Name>
+    <Name>GestionHospitalDB</Name>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
     <ProjectGuid>{0965f88a-db21-4b28-a3da-5b41db0614bd}</ProjectGuid>
@@ -56,15 +56,16 @@
   <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
   <ItemGroup>
     <Folder Include="Properties" />
-    <Folder Include="Tablas" />
     <Folder Include="Scripts" />
     <Folder Include="Scripts\PreDeployment" />
     <Folder Include="Scripts\PostDeployment" />
-    <Folder Include="Procedimientos Almacenados" />
+    <Folder Include="dbo" />
+    <Folder Include="dbo\Procedimientos Almacenados" />
+    <Folder Include="dbo\Tablas" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="Tablas\Usuario.sql" />
-    <Build Include="Procedimientos Almacenados\ConsultarUsuario.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarUsuario.sql" />
+    <Build Include="dbo\Tablas\Usuario.sql" />
   </ItemGroup>
   <ItemGroup>
     <PreDeploy Include="Scripts\PreDeployment\Script.PreDeployment.sql" />
@@ -73,6 +74,6 @@
     <PostDeploy Include="Scripts\PostDeployment\Script.PostDeployment.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="HospitalElOroBD.publish.xml" />
+    <None Include="HospitalElOroDB.publish.xml" />
   </ItemGroup>
 </Project>

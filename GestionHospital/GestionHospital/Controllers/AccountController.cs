@@ -1,14 +1,15 @@
-﻿using System;
+﻿using GestionHospital.Model.Shared;
+using GestionHospital.Models;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
+using Microsoft.Owin.Security;
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
-using Microsoft.Owin.Security;
-using GestionHospital.Models;
 
 namespace GestionHospital.Controllers
 {
@@ -79,6 +80,7 @@ namespace GestionHospital.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
+                    Session["Usuario"] = new Usuario() { Login = model.Email, IdUsuario = 1 };
                     return RedirectToLocal(returnUrl);
                 case SignInStatus.LockedOut:
                     return View("Lockout");
@@ -392,6 +394,9 @@ namespace GestionHospital.Controllers
         public ActionResult LogOff()
         {
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+
+            Session["Usuario"] = null;
+
             return RedirectToAction("Index", "Home");
         }
 

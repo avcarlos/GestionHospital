@@ -1,0 +1,123 @@
+﻿@using GestionHospital.Models.Administracion
+@model PersonalMedicoView
+
+<h2>@ViewBag.Title.</h2>
+<div class="row">
+    <div class="col-md-11">
+        <section id="medicoForm">
+            @using (Html.BeginForm("", "Administracion"))
+            {
+                @Html.AntiForgeryToken()
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <table style="width: 80%">
+                    <tr>
+                        <td>
+                            Tipo Identificación:
+                        </td>
+                        <td>
+                            @*@Html.Kendo().DropDownListFor();*@
+                            @Html.ValidationMessageFor(m => m.IdTipoIdentificacion, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Identificación:
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.Identificacion, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Identificacion, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Nombres:
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.Nombres, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Nombres, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Apellidos:
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.Apellidos, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Apellidos, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Correo Electrónico:
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Teléfono:
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.Telefono, new { @class = "form-control" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Dirección:
+                        </td>
+                        <td style="width:80%">
+                            @Html.TextAreaFor(m => m.Direccion, new { @class = "form-control" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Ciudad Residencia:
+                        </td>
+                        <td>
+                            @*@Html.Kendo().DropDownListFor()*@
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Fecha Nacimiento:
+                        </td>
+                        <td>
+                            @Html.Kendo().DatePickerFor(m => m.FechaNacimiento).Max(Model.FechaActual)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Género:
+                        </td>
+                        <td>
+                            @*@Html.Kendo().DropDownList()*@
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Especialidades:
+                        </td>
+                        <td>
+                            @*@Html.Kendo().Grid()*@
+                        </td>
+                    </tr>
+                </table>
+                <hr />
+                <table>
+                    <tr>
+                        <td>
+                            <input type="submit" value="Guardar" class="btn btn-default" onclick="" />
+                            <input type="button" value="Eliminar" class="btn btn-default" onclick="" />
+                            <input type="button" value="Limpiar" class="btn btn-default" onclick="" />
+                        </td>
+                    </tr>
+                </table>
+                @Html.HiddenFor(m => m.IdPersona)
+                @Html.HiddenFor(m => m.FechaActual)
+            }
+        </section>
+    </div>
+</div>

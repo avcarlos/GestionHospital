@@ -27,19 +27,24 @@ namespace GestionHospital.DataAccess
             database.CloseConnection(connection);
         }
 
-        public IDbDataParameter CreateParameter(string name, object value, DbType dbType)
+        public IDbDataParameter CreateParameter(string name, SqlDbType sqlDbType, int size)
         {
-            return DataParameterManager.CreateParameter(name, value, dbType, ParameterDirection.Input);
+            return DataParameterManager.CreateParameter(name, sqlDbType, size);
         }
 
-        public IDbDataParameter CreateParameter(string name, int size, object value, DbType dbType)
+        public IDbDataParameter CreateParameter(string name, SqlDbType sqlDbType, int size, ParameterDirection direction)
         {
-            return DataParameterManager.CreateParameter(name, size, value, dbType, ParameterDirection.Input);
+            return DataParameterManager.CreateParameter(name, sqlDbType, size, direction);
         }
 
-        public IDbDataParameter CreateParameter(string name, int size, object value, DbType dbType, ParameterDirection direction)
+        public IDbDataParameter CreateParameter(string name, SqlDbType sqlDdbType, int size, object value)
         {
-            return DataParameterManager.CreateParameter(name, size, value, dbType, direction);
+            return DataParameterManager.CreateParameter(name, sqlDdbType, size, value);
+        }
+
+        public IDbDataParameter CreateParameter(string name, SqlDbType sqlDbType, int size, object value, ParameterDirection direction)
+        {
+            return DataParameterManager.CreateParameter(name, sqlDbType, size, value, direction);
         }
 
         public DataTable GetDataTable(string commandText, CommandType commandType, IDbDataParameter[] parameters = null)
@@ -157,6 +162,7 @@ namespace GestionHospital.DataAccess
         public int Insert(string commandText, CommandType commandType, IDbDataParameter[] parameters, out int lastId)
         {
             lastId = 0;
+
             using (var connection = database.CreateConnection())
             {
                 connection.Open();

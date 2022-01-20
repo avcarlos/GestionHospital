@@ -5,32 +5,32 @@ namespace GestionHospital.DataAccess
 {
     public class DataParameterManager
     {
-        public static IDbDataParameter CreateParameter(string name, object value, DbType dbType, ParameterDirection direction = ParameterDirection.Input)
+        public static IDbDataParameter CreateParameter(string name, SqlDbType sqlDbType, int size, ParameterDirection direction = ParameterDirection.Input)
         {
-            return CreateSqlParameter(name, value, dbType, direction);
+            return CreateSqlParameter(name, sqlDbType, size, direction);
         }
 
-        public static IDbDataParameter CreateParameter(string name, int size, object value, DbType dbType, ParameterDirection direction = ParameterDirection.Input)
+        public static IDbDataParameter CreateParameter(string name, SqlDbType sqlDbType, int size, object value, ParameterDirection direction = ParameterDirection.Input)
         {
-            return CreateSqlParameter(name, size, value, dbType, direction);
+            return CreateSqlParameter(name, sqlDbType, size, value, direction);
         }
 
-        private static IDbDataParameter CreateSqlParameter(string name, object value, DbType dbType, ParameterDirection direction)
+        private static IDbDataParameter CreateSqlParameter(string name, SqlDbType sqlDbType, int size, ParameterDirection direction)
         {
             return new SqlParameter
             {
-                DbType = dbType,
+                SqlDbType = sqlDbType,
+                Size = size,
                 ParameterName = name,
-                Direction = direction,
-                Value = value
+                Direction = direction
             };
         }
 
-        private static IDbDataParameter CreateSqlParameter(string name, int size, object value, DbType dbType, ParameterDirection direction)
+        private static IDbDataParameter CreateSqlParameter(string name, SqlDbType sqlDbType, int size, object value, ParameterDirection direction)
         {
             return new SqlParameter
             {
-                DbType = dbType,
+                SqlDbType = sqlDbType,
                 Size = size,
                 ParameterName = name,
                 Direction = direction,

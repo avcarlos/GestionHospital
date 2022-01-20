@@ -66,6 +66,30 @@
   <ItemGroup>
     <Build Include="dbo\Procedimientos Almacenados\ConsultarUsuario.sql" />
     <Build Include="dbo\Tablas\Usuario.sql" />
+    <Build Include="dbo\Tablas\Transaccion.sql" />
+    <Build Include="dbo\Tablas\RolSeguridad.sql" />
+    <Build Include="dbo\Tablas\TransaccionRolSeguridad.sql" />
+    <Build Include="dbo\Tablas\Persona.sql" />
+    <Build Include="dbo\Tablas\Especialidad.sql" />
+    <Build Include="dbo\Tablas\EspecialidadMedico.sql" />
+    <Build Include="dbo\Tablas\TiempoConsulta.sql" />
+    <Build Include="dbo\Tablas\Factura.sql" />
+    <Build Include="dbo\Tablas\Cita.sql" />
+    <Build Include="dbo\Tablas\TipoPersona.sql" />
+    <Build Include="dbo\Tablas\Catalogo.sql" />
+    <Build Include="dbo\Tablas\DetalleCatalogo.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarTransaccionesUsuario.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\GuardarUsuario.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarPersona.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarDetalleCatalogo.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\GuardarPersona.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ActualizarPersona.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\EliminarPersona.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarEspecialidades.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarTipoPersona.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarEspecialidadesMedico.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\GuardarEspecialidadMedico.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\EliminarEspecialidadMedico.sql" />
   </ItemGroup>
   <ItemGroup>
     <PreDeploy Include="Scripts\PreDeployment\Script.PreDeployment.sql" />

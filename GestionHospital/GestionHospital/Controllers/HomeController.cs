@@ -12,53 +12,40 @@ namespace GestionHospital.Controllers
 {
     public class HomeController : Controller
     {
-        [AuthorizeUser(idOperacion:1)]
         public ActionResult Index()
         {
-            SeguridadCore objSeguridad = new SeguridadCore();
-
-            var usuarios = objSeguridad.ConsultarUsuarios();
-
-            return View();
-        }
-
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
             return View();
         }
 
         public JsonResult GetTransacciones()
         {
+            List<TransaccionMenu> transaccionesMenu = new List<TransaccionMenu>();
+
+            SeguridadCore objSeguridad = new SeguridadCore();
+
             var usuario = (Usuario)System.Web.HttpContext.Current.Session["Usuario"];
 
-            if (usuario != null && usuario.Login.Contains("carlosabalco"))
+            if (usuario != null)
             {
-                var result = new[] {
-                    new { Nombre = "Home", UrlTransaccion = UrlHelper.GenerateUrl(null, "Index", "Home", null, RouteTable.Routes, System.Web.HttpContext.Current.Request.RequestContext, false) },
-                    new { Nombre = "Acerca de", UrlTransaccion = UrlHelper.GenerateUrl(null, "About", "Home", null, RouteTable.Routes, System.Web.HttpContext.Current.Request.RequestContext, false) },
-                    new { Nombre = "Contacto", UrlTransaccion = UrlHelper.GenerateUrl(null, "Contact", "Home", null, RouteTable.Routes, System.Web.HttpContext.Current.Request.RequestContext, false) }
-                };
+                var transacciones = objSeguridad.ConsultarTransaccionesUsuario(usuario.LoginUsuario.Trim());
 
-                return Json(result.ToList(), JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                var result = new[] {
-                    new { Nombre = "Home", UrlTransaccion = UrlHelper.GenerateUrl(null, "Index", "Home", null, RouteTable.Routes, System.Web.HttpContext.Current.Request.RequestContext, false) },
-                    new { Nombre = "Contacto", UrlTransaccion = UrlHelper.GenerateUrl(null, "Contact", "Home", null, RouteTable.Routes, System.Web.HttpContext.Current.Request.RequestContext, false) }
-                };
+                foreach (var tran in transacciones.FindAll(t => !string.IsNullOrEmpty(t.Menu)))
+                {
+                    var datosMenu = tran.Menu.Split('\\');
 
-                return Json(result.ToList(), JsonRequestBehavior.AllowGet);
+                    if (datosMenu.Length == 2)
+                    {
+                        TransaccionMenu menu = new TransaccionMenu();
+
+                        menu.Nombre = tran.Nombre;
+                        menu.UrlTransaccion = UrlHelper.GenerateUrl(null, datosMenu[1], datosMenu[0], null, RouteTable.Routes, System.Web.HttpContext.Current.Request.RequestContext, false);
+
+                        transaccionesMenu.Add(menu);
+                    }
+                }
             }
+
+            return Json(transaccionesMenu, JsonRequestBehavior.AllowGet);
         }
     }
 }

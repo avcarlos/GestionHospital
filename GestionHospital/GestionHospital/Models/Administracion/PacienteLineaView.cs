@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GestionHospital.Model.Shared;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace GestionHospital.Models.Administracion
@@ -6,6 +7,9 @@ namespace GestionHospital.Models.Administracion
     public class PacienteLineaView
     {
         public int IdPersona { get; set; }
+
+        [Required]
+        public int IdTipoIdentificacion { get; set; }
 
         [Required]
         public string Identificacion { get; set; }
@@ -19,8 +23,15 @@ namespace GestionHospital.Models.Administracion
         [EmailAddress]
         public string Email { get; set; }
 
+        public int IdTipoPersona { get; set; }
+
+        public List<DetalleCatalogo> ListaTiposIdentificaciones { get; set; }
+
+        public bool EsPaciente { get; set; }
+
         public PacienteLineaView()
         {
+            ListaTiposIdentificaciones = new List<DetalleCatalogo>();
         }
     }
 }

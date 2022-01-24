@@ -2,7 +2,7 @@
 (
 	[IdPersona]				INT IDENTITY(1,1)	NOT NULL,
 	[Identificacion]		VARCHAR(13)		NOT NULL,
-	[IdTipoIdenticacion]	INT				NOT NULL,
+	[IdTipoIdentificacion]	INT				NOT NULL,
 	[Nombres]				VARCHAR(50)		NOT NULL,
 	[Apellidos]				VARCHAR(50)		NOT NULL,
 	[FechaNacimiento]		DATETIME		NULL,

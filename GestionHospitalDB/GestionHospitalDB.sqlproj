@@ -104,4 +104,7 @@
   <ItemGroup>
     <None Include="HospitalElOroDB.publish.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="GestionHospitalDB.refactorlog" />
+  </ItemGroup>
 </Project>

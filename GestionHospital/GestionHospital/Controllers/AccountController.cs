@@ -245,6 +245,26 @@ namespace GestionHospital.Controllers
             return code == null ? View("Error") : View();
         }
 
+        public ActionResult CambiarPasswordPaciente()
+        {
+            ResetPasswordViewModel vistaCambio = new ResetPasswordViewModel();
+
+            var usuario = (Usuario)System.Web.HttpContext.Current.Session["Usuario"];
+
+            if (usuario == null)
+                throw new Exception("No existe el usuario");
+
+            var user = UserManager.FindByName(usuario.LoginUsuario);
+
+            if (user == null)
+                throw new Exception("No existe el usuario");
+
+            vistaCambio.Email = usuario.LoginUsuario;
+            vistaCambio.Code = UserManager.GeneratePasswordResetToken(user.Id);
+
+            return View("ResetPassword", vistaCambio);
+        }
+
         //
         // POST: /Account/ResetPassword
         [HttpPost]
@@ -256,18 +276,24 @@ namespace GestionHospital.Controllers
             {
                 return View(model);
             }
+
             var user = await UserManager.FindByNameAsync(model.Email);
+
             if (user == null)
             {
                 // No revelar que el usuario no existe
                 return RedirectToAction("ResetPasswordConfirmation", "Account");
             }
+
             var result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
+            
             if (result.Succeeded)
             {
                 return RedirectToAction("ResetPasswordConfirmation", "Account");
             }
+            
             AddErrors(result);
+            
             return View();
         }
 

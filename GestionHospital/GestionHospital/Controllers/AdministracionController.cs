@@ -395,7 +395,7 @@ namespace GestionHospital.Controllers
             {
                 ViewBag.MessageError = ex.Message;
             }
-            
+
             return View("_Paciente", vistaPaciente);
         }
 
@@ -611,7 +611,51 @@ namespace GestionHospital.Controllers
         {
             ViewBag.Title = "Gestión de registro en línea";
 
+            AdministracionCore objAdministracion = new AdministracionCore();
+
             PacienteLineaView vistaPaciente = new PacienteLineaView();
+
+            try
+            {
+                var tipoIdentificaciones = objAdministracion.ConsultarDetallesCatalogo(3);
+
+                if (tipoIdentificaciones != null)
+                    tipoIdentificaciones = tipoIdentificaciones.FindAll(t => t.Parametro1.GetValueOrDefault() == 1);
+
+                vistaPaciente.ListaTiposIdentificaciones = tipoIdentificaciones;
+
+                var usuario = (Usuario)System.Web.HttpContext.Current.Session["Usuario"];
+
+                if (usuario.IdRolSeguridad == 2)    // Paciente
+                {
+                    vistaPaciente.EsPaciente = true;
+
+                    if (usuario.IdPersona.GetValueOrDefault() > 0)
+                    {
+                        var persona = objAdministracion.ConsultarPersonaId(usuario.IdPersona.GetValueOrDefault());
+                        var paciente = objAdministracion.ConsultarPaciente(persona.IdTipoIdentificacion, persona.Identificacion);
+
+                        if (paciente != null && paciente.EstadoTipo)
+                        {
+                            vistaPaciente.IdPersona = paciente.IdPersona;
+                            vistaPaciente.IdTipoIdentificacion = paciente.IdTipoIdentificacion;
+                            vistaPaciente.Identificacion = paciente.Identificacion;
+                            vistaPaciente.Nombres = paciente.Nombres;
+                            vistaPaciente.Apellidos = paciente.Apellidos;
+                            vistaPaciente.Email = paciente.Email;
+                            vistaPaciente.IdTipoPersona = paciente.IdTipo;
+                        }
+                        else
+                            throw new Exception("Paciente se encuentra inactivo. Acerquese al hospital.");
+                    }
+                    else
+                        throw new Exception("Usuario no asignado. Acerquese al hospital.");
+                }
+            }
+            catch (Exception ex)
+            {
+                ViewBag.MessageError = ex.Message;
+            }
 
             return View("_PacienteLinea", vistaPaciente);
         }
@@ -622,22 +666,94 @@ namespace GestionHospital.Controllers
 
             AdministracionCore objAdministracion = new AdministracionCore();
 
-            if (ModelState.IsValid)
-            {
-                Persona persona = new Persona()
-                {
-                    IdTipoIdentificacion = 11,
-                    Identificacion = vistaPaciente.Identificacion,
-                    Nombres = vistaPaciente.Nombres,
-                    Apellidos = vistaPaciente.Apellidos,
-                    Email = vistaPaciente.Email
-                };
+            List<DetalleCatalogo> tiposIdentificaciones = new List<DetalleCatalogo>();
 
-                if (vistaPaciente.IdPersona != 0)
-                    objAdministracion.ActualizarPersona(persona);
-                else
+            try
+            {
+                tiposIdentificaciones = objAdministracion.ConsultarDetallesCatalogo(3);
+
+                if (tiposIdentificaciones != null)
+                    tiposIdentificaciones = tiposIdentificaciones.FindAll(t => t.Parametro1.GetValueOrDefault() == 1);
+
+                if (ModelState.IsValid)
+                {
+                    Persona persona = new Persona()
+                    {
+                        IdPersona = vistaPaciente.IdPersona,
+                        IdTipoIdentificacion = vistaPaciente.IdTipoIdentificacion,
+                        Identificacion = vistaPaciente.Identificacion,
+                        Nombres = vistaPaciente.Nombres,
+                        Apellidos = vistaPaciente.Apellidos,
+                        Email = vistaPaciente.Email
+                    };
+
                     objAdministracion.GuardarPersona(persona);
+
+                    if (vistaPaciente.EsPaciente)
+                    {
+                        vistaPaciente = new PacienteLineaView();
+
+                        ModelState.Clear();
+                    }
+                }
+
+                ViewBag.Message = "Paciente Guardado Correctamente";
             }
+            catch (Exception ex)
+            {
+                ViewBag.MessageError = ex.Message;
+            }
+
+            vistaPaciente.ListaTiposIdentificaciones = tiposIdentificaciones;
+
+            return View("_PacienteLinea", vistaPaciente);
+        }
+
+        public ActionResult ActualizarPacienteLinea(PacienteLineaView vistaPaciente)
+        {
+            ViewBag.Title = "Gestión de pacientes en Línea";
+
+            AdministracionCore objAdministracion = new AdministracionCore();
+
+            List<DetalleCatalogo> tiposIdentificaciones = new List<DetalleCatalogo>();
+
+            try
+            {
+                tiposIdentificaciones = objAdministracion.ConsultarDetallesCatalogo(3);
+
+                if (tiposIdentificaciones != null)
+                    tiposIdentificaciones = tiposIdentificaciones.FindAll(t => t.Parametro1.GetValueOrDefault() == 1);
+
+                if (ModelState.IsValid)
+                {
+                    Paciente paciente = new Paciente()
+                    {
+                        IdPersona = vistaPaciente.IdPersona,
+                        IdTipoIdentificacion = vistaPaciente.IdTipoIdentificacion,
+                        Identificacion = vistaPaciente.Identificacion,
+                        Nombres = vistaPaciente.Nombres,
+                        Apellidos = vistaPaciente.Apellidos,
+                        Email = vistaPaciente.Email
+                    };
+
+                    objAdministracion.ActualizarPaciente(paciente);
+
+                    if (!vistaPaciente.EsPaciente)
+                    {
+                        vistaPaciente = new PacienteLineaView();
+
+                        ModelState.Clear();
+                    }
+                }
+
+                ViewBag.Message = "Paciente Actualizado Correctamente";
+            }
+            catch (Exception ex)
+            {
+                ViewBag.MessageError = ex.Message;
+            }
+
+            vistaPaciente.ListaTiposIdentificaciones = tiposIdentificaciones;
 
             return View("_PacienteLinea", vistaPaciente);
         }

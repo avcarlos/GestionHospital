@@ -109,7 +109,7 @@ namespace GestionHospital.Logica
             IDbDataParameter[] parameters = new IDbDataParameter[12]
             {
                 objData.CreateParameter("@i_identificacion", SqlDbType.VarChar, 13, persona.Identificacion),
-                objData.CreateParameter("@i_id_tipo_identicacion", SqlDbType.Int, 4, persona.IdTipoIdentificacion),
+                objData.CreateParameter("@i_id_tipo_identificacion", SqlDbType.Int, 4, persona.IdTipoIdentificacion),
                 objData.CreateParameter("@i_nombres", SqlDbType.VarChar, 50, persona.Nombres),
                 objData.CreateParameter("@i_apellidos", SqlDbType.VarChar, 50, persona.Apellidos),
                 objData.CreateParameter("@i_fecha_nacimiento", SqlDbType.DateTime, 8),

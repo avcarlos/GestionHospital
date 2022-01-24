@@ -1,51 +1,90 @@
 ﻿@using GestionHospital.Models.Administracion
-@model PacienteView
-@{ 
+@model PacienteLineaView
+@{
     var identificacion = ViewData.TemplateInfo.GetFullHtmlFieldId("Identificacion");
 }
 <h2>@ViewBag.Title.</h2>
+<h4 id="mensajeError" class="text-danger" style="display:@(string.IsNullOrEmpty(ViewBag.MessageError) ? "none" : string.Empty)">@ViewBag.MessageError.</h4>
+<h4 id="mensajeExito" class="text-info" style="display:@(string.IsNullOrEmpty(ViewBag.Message) ? "none" : string.Empty)">@ViewBag.Message.</h4>
 <div class="row">
     <div class="col-md-11">
         <section id="medicoForm">
             <script type="text/javascript">
                 $(document).ready(function () {
+                    $('#guardar').click(function () {
+                        $('form').attr('Action', '/Administracion/GuardarPacienteLinea');
+                    });
+
+                    $('#actualizar').click(function () {
+                        $('form').attr('Action', '/Administracion/ActualizarPacienteLinea');
+                    });
+
+                    $('#cambiarPassword').click(function () {
+                        $('form').attr('Action', '/Account/CambiarPasswordPaciente');
+                    });
+
+                    $('#limpiar').click(function () {
+                        $('form').attr('Action', '/Administracion/PacienteLinea');
+                    });
+
                     $('#@identificacion').change(
                         function (event) {
+                            var idTipoIdentificacionParam = $('#IdTipoIdentificacion').data('kendoDropDownList').value();
                             var identificacionParam = $('#@identificacion').val();
+
+                            $('#mensajeError').hide();
+                            $('#mensajeExito').hide();
+
+                            document.getElementById('guardar').disabled = 'disabled';
+                            document.getElementById('actualizar').disabled = 'disabled';
+                            $('#cambiarPassword').hide();
+
+                            $('#IdPersona').val(0);
+                            $('#Nombres').val('');
+                            $('#Apellidos').val('');
+                            $('#Email').val('');
+                            $('#IdTipoPersona').val(0);
+
+                            if (identificacionParam == "")
+                                return;
+
+                            mostrarVentanaCargando();
 
                             $.ajax({
                                 type: "POST",
-                                url: '@Url.Action("ConsultarPersona", "Administracion")',
-                                data: { idTipoIdentificacion: 11, identificacion: identificacionParam },
+                                url: '@Url.Action("ConsultarPaciente", "Administracion")',
+                                data: { idTipoIdentificacion: idTipoIdentificacionParam, identificacion: identificacionParam },
                                 success: function (result) {
                                     if (result != "") {
-                                        alert('Paciente existente');
+                                        if (result.IdTipo != 6) {
+                                            alert('Aún no ha sido registrado como paciente.');
 
+                                            document.getElementById('guardar').disabled = '';
+                                        } else {
+                                            document.getElementById('actualizar').disabled = '';
+                                        }
+
+                                        $('#IdPersona').val(result.IdPersona);
                                         $('#Nombres').val(result.Nombres);
                                         $('#Apellidos').val(result.Apellidos);
                                         $('#Email').val(result.Email);
-                                        $('#Telefono').val(result.Telefono);
-                                        $('#Direccion').val(result.Direccion);
-                                        $('#IdCiudad').data('kendoDropDownList').value(result.IdCiudad);
-                                        $('#IdGenero').data('kendoDropDownList').value(result.IdGenero);
-                                        $('#FechaNacimiento').data('kendoDatePicker').value(result.FechaNacimiento);
+                                        $('#IdTipoPersona').val(result.IdTipo);
+                                    } else {
+                                        document.getElementById('guardar').disabled = '';
                                     }
                                 },
                                 error: function (err) {
-                                    if (mostrarMensajeErrorAjax(err)) {
-                                        alert('Error al consultar paciente: ' + err.statusText);
-                                    }
+                                    alert('Error al consultar paciente: ' + err.responseJSON);
+                                },
+                                complete: function () {
+                                    cerrarVentanaCargando();
                                 }
                             });
                         }
                     );
                 })
-
-                function mostrarError() {
-                    alert('Error');
-                }
             </script>
-            @using (Html.BeginForm("GuardarPacienteLinea", "Administracion"))
+            @using (Html.BeginForm())
             {
                 @Html.AntiForgeryToken()
                 <hr />
@@ -53,10 +92,33 @@
                 <table style="width: 80%">
                     <tr>
                         <td>
+                            Tipo Identificación:
+                        </td>
+                        <td>
+                            @if (Model.EsPaciente)
+                            {
+                                @Html.Kendo().DropDownListFor(m => m.IdTipoIdentificacion).BindTo(new SelectList(Model.ListaTiposIdentificaciones, "IdDetalleCatalogo", "Nombre")).Enable(false)
+                            }
+                            else
+                            {
+                                @Html.Kendo().DropDownListFor(m => m.IdTipoIdentificacion).BindTo(new SelectList(Model.ListaTiposIdentificaciones, "IdDetalleCatalogo", "Nombre"))
+                            }
+                            @Html.ValidationMessageFor(m => m.IdTipoIdentificacion, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
                             Identificación:
                         </td>
                         <td>
-                            @Html.TextBoxFor(m => m.Identificacion, new { @class = "form-control" })
+                            @if (Model.EsPaciente)
+                            {
+                                @Html.TextBoxFor(m => m.Identificacion, new { @readonly = "readonly", @class = "form-control" })
+                            }
+                            else
+                            {
+                                @Html.TextBoxFor(m => m.Identificacion, new { @class = "form-control" })
+                            }
                             @Html.ValidationMessageFor(m => m.Identificacion, "", new { @class = "text-danger" })
                         </td>
                     </tr>
@@ -92,14 +154,16 @@
                 <table>
                     <tr>
                         <td>
-                            <input type="submit" value="Guardar" class="btn btn-default" />
-                            @*<input type="button" value="Eliminar" class="btn btn-default" onclick="" />*@
-                            <input type="button" value="Limpiar" class="btn btn-default" onclick="submitFormNoValidation('@Url.Action("Paciente", "Administracion")', this)" />
+                            <input type="submit" id="guardar" value="Guardar" class="btn btn-default" style="display:@(Model.EsPaciente? "none" : string.Empty)" @(string.IsNullOrEmpty(Model.Identificacion) ? "disabled" : "") />
+                            <input type="submit" id="actualizar" value="Actualizar" class="btn btn-default" @(Model.IdTipoPersona != 6 ? "disabled" : "") />
+                            <input type="submit" id="cambiarPassword" value="Recuperar Contraseña" class="btn btn-default" style="display:@(Model.EsPaciente && Model.IdPersona > 0 ? string.Empty : "none" )" />
+                            <input type="submit" id="limpiar" value="Limpiar" class="btn btn-default" />
                         </td>
                     </tr>
                 </table>
                 @Html.HiddenFor(m => m.IdPersona)
-                @Html.HiddenFor(m => m.FechaActual)
+                @Html.HiddenFor(m => m.IdTipoPersona)
+                @Html.HiddenFor(m => m.EsPaciente)
             }
         </section>
     </div>

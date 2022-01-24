@@ -94,6 +94,8 @@
     <Build Include="dbo\Procedimientos Almacenados\EliminarTipoPersona.sql" />
     <Build Include="dbo\Procedimientos Almacenados\ConsultarPersonaId.sql" />
     <Build Include="dbo\Procedimientos Almacenados\RegistrarPersonaUsuario.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarPersonaEmail.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarUsuarioPersona.sql" />
   </ItemGroup>
   <ItemGroup>
     <PreDeploy Include="Scripts\PreDeployment\Script.PreDeployment.sql" />

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using GestionHospital.Model.Shared;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace GestionHospital.Models
@@ -65,6 +66,22 @@ namespace GestionHospital.Models
     public class RegisterViewModel
     {
         [Required]
+        [Display(Name = "Tipo Identificación")]
+        public int IdTipoIdentificacion { get; set; }
+
+        [Required]
+        [Display(Name = "Identificación")]
+        public string Identificacion { get; set; }
+
+        [Required]
+        [Display(Name = "Nombres")]
+        public string Nombres { get; set; }
+
+        [Required]
+        [Display(Name = "Apellidos")]
+        public string Apellidos { get; set; }
+
+        [Required]
         [EmailAddress]
         [Display(Name = "Correo electrónico")]
         public string Email { get; set; }
@@ -79,6 +96,8 @@ namespace GestionHospital.Models
         [Display(Name = "Confirmar contraseña")]
         [Compare("Password", ErrorMessage = "La contraseña y la contraseña de confirmación no coinciden.")]
         public string ConfirmPassword { get; set; }
+
+        public List<DetalleCatalogo> ListaTiposIdentificaciones { get; set; }
     }
 
     public class ResetPasswordViewModel

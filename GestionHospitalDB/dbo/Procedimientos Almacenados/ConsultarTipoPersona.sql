@@ -4,5 +4,6 @@ AS
 
 SELECT	*
 FROM	dbo.TipoPersona
+WHERE	IdPersona = @i_id_persona
 
 RETURN 0

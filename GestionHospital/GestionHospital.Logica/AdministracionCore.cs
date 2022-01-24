@@ -102,6 +102,20 @@ namespace GestionHospital.Logica
             return persona;
         }
 
+        public List<Persona> ConsultarPersonasEmail(string email)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[1]
+            {
+                objData.CreateParameter("@i_email", SqlDbType.VarChar, 30, email)
+            };
+
+            var personas = objData.ConsultarDatos<Persona>("ConsultarPersonaEmail", parameters);
+
+            return personas;
+        }
+
         public int GuardarPersona(Persona persona)
         {
             var objData = GetConnection();
@@ -229,6 +243,67 @@ namespace GestionHospital.Logica
             };
 
             objData.Delete("EliminarTipoPersona", CommandType.StoredProcedure, parameters);
+        }
+
+        public bool ValidarEmailPersona(Persona persona, out string mensaje)
+        {
+            bool valido = true;
+            mensaje = "";
+
+            var personas = ConsultarPersonasEmail(persona.Email);
+
+            if (personas != null && personas.Count() > 0)
+            {
+                if (personas.Count() > 1)
+                    mensaje += string.Format("Existe más de una persona asociada con el correo {0}. ", persona.Email);
+                else
+                {
+                    var personaTemp = personas.FirstOrDefault();
+
+                    if (personaTemp.Identificacion != persona.Identificacion)
+                        mensaje += string.Format("La identificación {0} no coincide con la identificación {1} registrada con ese correo. ", persona.Identificacion, personaTemp.Identificacion);
+
+                    if (personaTemp.IdTipoIdentificacion != persona.IdTipoIdentificacion)
+                        mensaje += string.Format("El tipo de identificación ingresado no coincide con el almacenado anteriormente. ");
+                }
+            }
+
+            if (!string.IsNullOrEmpty(mensaje))
+                valido = false;
+
+            return valido;
+        }
+
+        public void RegistrarUsuarioPersona(Usuario usuario, Paciente paciente)
+        {
+            SeguridadCore objSeguridad = new SeguridadCore();
+
+            var personaExistente = ConsultarPersona(paciente.IdTipoIdentificacion, paciente.Identificacion);
+
+            using (TransactionScope tran = new TransactionScope(TransactionScopeOption.Required))
+            {
+                if (personaExistente != null)
+                {
+                    paciente.IdPersona = personaExistente.IdPersona;
+
+                    var tipos = ConsultarTiposPersona(personaExistente.IdPersona);
+
+                    if (tipos != null && tipos.Count() > 0 && tipos.Exists(t => t.IdTipo == 6))
+                        ActualizarPaciente(paciente);
+                    else
+                        GuardarPaciente(paciente);
+                }
+                else
+                {
+                    paciente.IdPersona = GuardarPaciente(paciente);
+                }
+
+                usuario.IdPersona = paciente.IdPersona;
+
+                objSeguridad.GuardarUsuario(usuario);
+
+                tran.Complete();
+            }
         }
 
         #endregion
@@ -413,7 +488,7 @@ namespace GestionHospital.Logica
             return paciente;
         }
 
-        public void GuardarPaciente(Paciente paciente)
+        public int GuardarPaciente(Paciente paciente)
         {
             using (TransactionScope tran = new TransactionScope(TransactionScopeOption.Required))
             {
@@ -426,6 +501,8 @@ namespace GestionHospital.Logica
 
                 tran.Complete();
             }
+
+            return paciente.IdPersona;
         }
 
         public void ActualizarPaciente(Paciente paciente)

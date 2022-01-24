@@ -25,7 +25,7 @@ namespace GestionHospital.Controllers
         {
         }
 
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
+        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
         {
             UserManager = userManager;
             SignInManager = signInManager;
@@ -37,9 +37,9 @@ namespace GestionHospital.Controllers
             {
                 return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
             }
-            private set 
-            { 
-                _signInManager = value; 
+            private set
+            {
+                _signInManager = value;
             }
         }
 
@@ -124,7 +124,7 @@ namespace GestionHospital.Controllers
             // Si un usuario introduce códigos incorrectos durante un intervalo especificado de tiempo, la cuenta del usuario 
             // se bloqueará durante un período de tiempo especificado. 
             // Puede configurar el bloqueo de la cuenta en IdentityConfig
-            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent:  model.RememberMe, rememberBrowser: model.RememberBrowser);
+            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: model.RememberMe, rememberBrowser: model.RememberBrowser);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -143,7 +143,18 @@ namespace GestionHospital.Controllers
         [AllowAnonymous]
         public ActionResult Register()
         {
-            return View();
+            AdministracionCore objAdministracion = new AdministracionCore();
+
+            RegisterViewModel vistaRegistro = new RegisterViewModel();
+
+            var tipoIdentificaciones = objAdministracion.ConsultarDetallesCatalogo(3);
+
+            if (tipoIdentificaciones != null)
+                tipoIdentificaciones = tipoIdentificaciones.FindAll(t => t.Parametro1.GetValueOrDefault() == 1);
+
+            vistaRegistro.ListaTiposIdentificaciones = tipoIdentificaciones;
+
+            return View("Register", vistaRegistro);
         }
 
         //
@@ -153,27 +164,57 @@ namespace GestionHospital.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
+            AdministracionCore objAdministracion = new AdministracionCore();
+            SeguridadCore objSeguridad = new SeguridadCore();
+
+            var tipoIdentificaciones = objAdministracion.ConsultarDetallesCatalogo(3);
+
+            if (tipoIdentificaciones != null)
+                tipoIdentificaciones = tipoIdentificaciones.FindAll(t => t.Parametro1.GetValueOrDefault() == 1);
+
+            model.ListaTiposIdentificaciones = tipoIdentificaciones;
+
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-                var result = await UserManager.CreateAsync(user, model.Password);
-                
-                if (result.Succeeded)
+                if (!objSeguridad.ValidarExisteUsuario(model.Email))
                 {
-                    await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
+                    Paciente paciente = new Paciente() { IdTipoIdentificacion = model.IdTipoIdentificacion, Identificacion = model.Identificacion, Nombres = model.Nombres, Apellidos = model.Apellidos, Email = model.Email };
 
-                    // Para obtener más información sobre cómo habilitar la confirmación de cuentas y el restablecimiento de contraseña, visite https://go.microsoft.com/fwlink/?LinkID=320771
-                    // Enviar un correo electrónico con este vínculo
-                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // await UserManager.SendEmailAsync(user.Id, "Confirmar la cuenta", "Para confirmar su cuenta, haga clic <a href=\"" + callbackUrl + "\">aquí</a>");
+                    if (objAdministracion.ValidarEmailPersona(paciente, out string mensajeError))
+                    {
+                        var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                        var result = await UserManager.CreateAsync(user, model.Password);
 
-                    new SeguridadCore().GuardarUsuario(new Usuario() { LoginUsuario = model.Email, IdRolSeguridad = 2 });
+                        if (result.Succeeded)
+                        {
+                            await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
 
-                    return RedirectToAction("Index", "Home");
+                            // Para obtener más información sobre cómo habilitar la confirmación de cuentas y el restablecimiento de contraseña, visite https://go.microsoft.com/fwlink/?LinkID=320771
+                            // Enviar un correo electrónico con este vínculo
+                            // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                            // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                            // await UserManager.SendEmailAsync(user.Id, "Confirmar la cuenta", "Para confirmar su cuenta, haga clic <a href=\"" + callbackUrl + "\">aquí</a>");
+
+                            Usuario usuario = new Usuario() { LoginUsuario = model.Email, IdRolSeguridad = 2 };
+
+                            objAdministracion.RegistrarUsuarioPersona(usuario, paciente);
+
+                            Session["Usuario"] = new SeguridadCore().ConsultarUsuario(usuario.LoginUsuario);
+
+                            return RedirectToAction("Index", "Home");
+                        }
+
+                        AddErrors(result);
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", mensajeError);
+                    }
                 }
-
-                AddErrors(result);
+                else
+                {
+                    ModelState.AddModelError("", "Usuario existente.");
+                }
             }
 
             // Si llegamos a este punto, es que se ha producido un error y volvemos a mostrar el formulario
@@ -286,14 +327,14 @@ namespace GestionHospital.Controllers
             }
 
             var result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
-            
+
             if (result.Succeeded)
             {
                 return RedirectToAction("ResetPasswordConfirmation", "Account");
             }
-            
+
             AddErrors(result);
-            
+
             return View();
         }
 
@@ -476,7 +517,7 @@ namespace GestionHospital.Controllers
 
                 if (usuario != null)
                 {
-                    if(usuario.IdPersona.GetValueOrDefault() == 0)
+                    if (usuario.IdPersona.GetValueOrDefault() == 0)
                     {
                         usuario.IdPersona = idPersona;
 
@@ -498,12 +539,12 @@ namespace GestionHospital.Controllers
                     string token = UserManager.GeneratePasswordResetToken(user.Id);
 
                     var result = UserManager.ResetPassword(user.Id, token, password);
-                    
+
                     if (!result.Succeeded)
                     {
                         string mensaje = "";
 
-                        foreach(var error in result.Errors)
+                        foreach (var error in result.Errors)
                         {
                             if (string.IsNullOrEmpty(mensaje))
                                 mensaje = error;

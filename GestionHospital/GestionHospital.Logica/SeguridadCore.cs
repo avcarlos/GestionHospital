@@ -13,6 +13,8 @@ namespace GestionHospital.Logica
     {
         private static DBManager GetConnection() => new DBManager();
 
+        #region Usuario
+
         public Usuario ConsultarUsuario(string nombreUsuario)
         {
             var objData = GetConnection();
@@ -25,6 +27,25 @@ namespace GestionHospital.Logica
             };
 
             var usuarios = objData.ConsultarDatos<Usuario>("ConsultarUsuario", parameters);
+
+            if (usuarios != null && usuarios.Count() > 0)
+                usuario = usuarios.FirstOrDefault();
+
+            return usuario;
+        }
+
+        public Usuario ConsultarUsuarioPersona(int idPersona)
+        {
+            var objData = GetConnection();
+
+            Usuario usuario = null;
+
+            IDbDataParameter[] parameters = new IDbDataParameter[1]
+            {
+                objData.CreateParameter("@i_id_persona", SqlDbType.Int, 4, idPersona)
+            };
+
+            var usuarios = objData.ConsultarDatos<Usuario>("ConsultarUsuarioPersona", parameters);
 
             if (usuarios != null && usuarios.Count() > 0)
                 usuario = usuarios.FirstOrDefault();
@@ -102,5 +123,19 @@ namespace GestionHospital.Logica
 
             return nuevoPassword;
         }
+
+        public bool ValidarExisteUsuario(string loginUsuario)
+        {
+            bool existe = false;
+
+            var usuario = ConsultarUsuario(loginUsuario);
+
+            if (usuario != null)
+                existe = true;
+
+            return existe;
+        }
+
+        #endregion
     }
 }

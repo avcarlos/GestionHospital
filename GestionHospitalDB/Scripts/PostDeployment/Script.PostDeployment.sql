@@ -108,9 +108,9 @@ IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 2) IN
 IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 5) INSERT INTO dbo.DetalleCatalogo (IdDetalleCatalogo, IdCatalogo, Nombre, Codigo, Estado) VALUES (5, 2, 'Medico', 'MED', 1)
 IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 6) INSERT INTO dbo.DetalleCatalogo (IdDetalleCatalogo, IdCatalogo, Nombre, Codigo, Estado) VALUES (6, 2, 'Paciente', 'PAC', 1)
 
-IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 11) INSERT INTO dbo.DetalleCatalogo (IdDetalleCatalogo, IdCatalogo, Nombre, Codigo, Estado) VALUES (11, 3, 'Cédula', 'C', 1)
-IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 12) INSERT INTO dbo.DetalleCatalogo (IdDetalleCatalogo, IdCatalogo, Nombre, Codigo, Estado) VALUES (12, 3, 'Pasaporte', 'P', 1)
-IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 13) INSERT INTO dbo.DetalleCatalogo (IdDetalleCatalogo, IdCatalogo, Nombre, Codigo, Estado) VALUES (13, 3, 'RUC', 'R', 1)
+IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 11) INSERT INTO dbo.DetalleCatalogo (IdDetalleCatalogo, IdCatalogo, Nombre, Codigo, Estado, Parametro1) VALUES (11, 3, 'Cédula', 'C', 1, 1)
+IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 12) INSERT INTO dbo.DetalleCatalogo (IdDetalleCatalogo, IdCatalogo, Nombre, Codigo, Estado, Parametro1) VALUES (12, 3, 'Pasaporte', 'P', 1, 1)
+IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 13) INSERT INTO dbo.DetalleCatalogo (IdDetalleCatalogo, IdCatalogo, Nombre, Codigo, Estado, Parametro1) VALUES (13, 3, 'RUC', 'R', 1, 0)
 
 IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 15) INSERT INTO dbo.DetalleCatalogo (IdDetalleCatalogo, IdCatalogo, Nombre, Codigo, Estado) VALUES (15, 4, 'Pendiente', 'PE', 1)
 IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 16) INSERT INTO dbo.DetalleCatalogo (IdDetalleCatalogo, IdCatalogo, Nombre, Codigo, Estado) VALUES (16, 4, 'Atendido', 'AT', 1)

@@ -10,6 +10,9 @@ namespace GestionHospital.Models.Administracion
         public int IdPersona { get; set; }
 
         [Required]
+        public int IdTipoIdentificacion { get; set; }
+
+        [Required]
         public string Identificacion { get; set; }
 
         [Required]
@@ -33,7 +36,9 @@ namespace GestionHospital.Models.Administracion
 
         public int IdCiudad { get; set; }
 
-        public bool Estado { get; set; }
+        public int Estado { get; set; }
+
+        public int IdTipoPersona { get; set; }
 
         public List<DetalleCatalogo> ListaTiposIdentificaciones { get; set; }
 

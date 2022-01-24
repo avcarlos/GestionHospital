@@ -83,6 +83,25 @@ namespace GestionHospital.Logica
             return persona;
         }
 
+        public Persona ConsultarPersonaId(int idPersona)
+        {
+            var objData = GetConnection();
+
+            Persona persona = null;
+
+            IDbDataParameter[] parameters = new IDbDataParameter[1]
+            {
+                objData.CreateParameter("@i_id_persona", SqlDbType.Int, 4, idPersona)
+            };
+
+            var personas = objData.ConsultarDatos<Persona>("ConsultarPersonaId", parameters);
+
+            if (personas != null && personas.Count() > 0)
+                persona = personas.FirstOrDefault();
+
+            return persona;
+        }
+
         public int GuardarPersona(Persona persona)
         {
             var objData = GetConnection();
@@ -360,6 +379,79 @@ namespace GestionHospital.Logica
             };
 
             objData.Delete("EliminarEspecialidadMedico", CommandType.StoredProcedure, parameters);
+        }
+
+        #endregion
+
+        #region Paciente
+
+        public Paciente ConsultarPaciente(int idTipoIdentificacion, string identificacion)
+        {
+            Paciente paciente = ConsultarDatosPaciente(idTipoIdentificacion, identificacion);
+
+            return paciente;
+        }
+
+        public Paciente ConsultarDatosPaciente(int idTipoIdentificacion, string identificacion)
+        {
+            var objData = GetConnection();
+
+            Paciente paciente = null;
+
+            IDbDataParameter[] parameters = new IDbDataParameter[3]
+            {
+                objData.CreateParameter("@i_id_tipo_identificacion", SqlDbType.Int, 4, idTipoIdentificacion),
+                objData.CreateParameter("@i_identificacion", SqlDbType.VarChar, 13, identificacion),
+                objData.CreateParameter("@i_id_tipo_persona", SqlDbType.Int, 4, 6)
+            };
+
+            var pacientes = objData.ConsultarDatos<Paciente>("ConsultarPersona", parameters);
+
+            if (pacientes != null && pacientes.Count() > 0)
+                paciente = pacientes.FirstOrDefault();
+
+            return paciente;
+        }
+
+        public void GuardarPaciente(Paciente paciente)
+        {
+            using (TransactionScope tran = new TransactionScope(TransactionScopeOption.Required))
+            {
+                if (paciente.IdPersona == 0)
+                    paciente.IdPersona = GuardarPersona(paciente);
+                else
+                    ActualizarPersona(paciente);
+
+                GuardarTipoPersona(new TipoPersona() { IdPersona = paciente.IdPersona, IdTipo = 6 });
+
+                tran.Complete();
+            }
+        }
+
+        public void ActualizarPaciente(Paciente paciente)
+        {
+            using (TransactionScope tran = new TransactionScope(TransactionScopeOption.Required))
+            {
+                ActualizarPersona(paciente);
+
+                var tipos = ConsultarTiposPersona(paciente.IdPersona);
+                var tipoPaciente = tipos.FirstOrDefault(t => t.IdTipo == 6);
+
+                if (!tipoPaciente.Estado && paciente.EstadoTipo)
+                    GuardarTipoPersona(new TipoPersona() { IdPersona = paciente.IdPersona, IdTipo = 6 });
+
+                tran.Complete();
+            }
+        }
+
+        public void EliminarPaciente(Paciente paciente)
+        {
+            using (TransactionScope tran = new TransactionScope(TransactionScopeOption.Required))
+            {
+                EliminarTipoPersona(new TipoPersona() { IdPersona = paciente.IdPersona, IdTipo = 6 });
+
+                tran.Complete();
+            }
         }
 
         #endregion

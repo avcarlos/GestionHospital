@@ -57,7 +57,7 @@
                             $('#IdGenero').data('kendoDropDownList').value();
                             $('#FechaNacimiento').data('kendoDatePicker').value();
                             $('#Estado').data('kendoComboBox').value();
-                            $('#IsTipoPersona').val(0);
+                            $('#IdTipoPersona').val(0);
 
                             refrescarGridEspecialidades();
 
@@ -104,7 +104,7 @@
                                     }
                                 },
                                 error: function (err) {
-                                    alert('Error al consultar médico: ' + err.statusText);
+                                    alert('Error al consultar médico: ' + err.responseJSON);
                                 },
                                 complete: function () {
                                     cerrarVentanaCargando();

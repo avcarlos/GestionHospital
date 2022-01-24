@@ -92,6 +92,8 @@
     <Build Include="dbo\Procedimientos Almacenados\EliminarEspecialidadMedico.sql" />
     <Build Include="dbo\Procedimientos Almacenados\GuardarTipoPersona.sql" />
     <Build Include="dbo\Procedimientos Almacenados\EliminarTipoPersona.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarPersonaId.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\RegistrarPersonaUsuario.sql" />
   </ItemGroup>
   <ItemGroup>
     <PreDeploy Include="Scripts\PreDeployment\Script.PreDeployment.sql" />

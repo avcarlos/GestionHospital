@@ -7,6 +7,7 @@ using Microsoft.Owin.Security;
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
@@ -432,6 +433,106 @@ namespace GestionHospital.Controllers
 
             base.Dispose(disposing);
         }
+
+        public JsonResult GenerarPasswordPaciente(int idPersona)
+        {
+            AdministracionCore objAdministracion = new AdministracionCore();
+            SeguridadCore objSeguridad = new SeguridadCore();
+
+            try
+            {
+                var persona = objAdministracion.ConsultarPersonaId(idPersona);
+
+                if (string.IsNullOrEmpty(persona.Email))
+                    throw new Exception("Se requiere correo electrónico.");
+
+                var usuario = objSeguridad.ConsultarUsuario(persona.Email);
+
+                if (usuario != null)
+                {
+                    if(usuario.IdPersona.GetValueOrDefault() == 0)
+                    {
+                        usuario.IdPersona = idPersona;
+
+                        objSeguridad.RegistrarPersonaUsuario(usuario);
+                    }
+                }
+                else
+                {
+                    usuario = new Usuario() { LoginUsuario = persona.Email, IdRolSeguridad = 2, IdPersona = idPersona };
+
+                    usuario.IdUsuario = objSeguridad.GuardarUsuario(usuario);
+                }
+
+                var user = UserManager.FindByName(persona.Email);
+                string password = objSeguridad.GenerarPasswordUsuario(usuario);
+
+                if (user != null)
+                {
+                    string token = UserManager.GeneratePasswordResetToken(user.Id);
+
+                    var result = UserManager.ResetPassword(user.Id, token, password);
+                    
+                    if (!result.Succeeded)
+                    {
+                        string mensaje = "";
+
+                        foreach(var error in result.Errors)
+                        {
+                            if (string.IsNullOrEmpty(mensaje))
+                                mensaje = error;
+                            else
+                                mensaje += ". " + error;
+                        }
+
+                        throw new Exception(mensaje);
+                    }
+                }
+                else
+                {
+                    user = new ApplicationUser { UserName = persona.Email, Email = persona.Email };
+                    var result = UserManager.Create(user, password);
+
+                    if (!result.Succeeded)
+                    {
+                        string mensaje = "";
+
+                        foreach (var error in result.Errors)
+                        {
+                            if (string.IsNullOrEmpty(mensaje))
+                                mensaje = error;
+                            else
+                                mensaje += ". " + error;
+                        }
+
+                        throw new Exception(mensaje);
+                    }
+                }
+
+                var data = new
+                {
+                    password
+                };
+
+                return Json(data);
+            }
+            catch (Exception ex)
+            {
+                return RetornarErrorJsonResult(ex.Message);
+            }
+        }
+
+        #region Comunes
+
+        private JsonResult RetornarErrorJsonResult(string mensajeError)
+        {
+            Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            Response.StatusDescription = mensajeError.Replace(Environment.NewLine, string.Empty);
+
+            return Json(mensajeError, JsonRequestBehavior.AllowGet);
+        }
+
+        #endregion
 
         #region Aplicaciones auxiliares
         // Se usa para la protección XSRF al agregar inicios de sesión externos

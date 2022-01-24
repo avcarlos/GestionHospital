@@ -7,5 +7,9 @@
         public string LoginUsuario { get; set; }
 
         public int IdRolSeguridad { get; set; }
+
+        public int? IdPersona { get; set; }
+
+        public bool Estado { get; set; }
     }
 }

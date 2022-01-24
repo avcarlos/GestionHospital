@@ -378,26 +378,55 @@ namespace GestionHospital.Controllers
 
             PacienteView vistaPaciente = new PacienteView();
 
-            vistaPaciente.ListaTiposIdentificaciones = objAdministracion.ConsultarDetallesCatalogo(3);
-            vistaPaciente.ListaGeneros = objAdministracion.ConsultarDetallesCatalogo(1);
-            vistaPaciente.ListaCiudades = objAdministracion.ConsultarDetallesCatalogo(5);
-            vistaPaciente.FechaActual = DateTime.Now;
+            try
+            {
+                vistaPaciente.FechaActual = DateTime.Now;
 
+                var tipoIdentificaciones = objAdministracion.ConsultarDetallesCatalogo(3);
+
+                if (tipoIdentificaciones != null)
+                    tipoIdentificaciones = tipoIdentificaciones.FindAll(t => t.Parametro1.GetValueOrDefault() == 1);
+
+                vistaPaciente.ListaTiposIdentificaciones = tipoIdentificaciones;
+                vistaPaciente.ListaGeneros = objAdministracion.ConsultarDetallesCatalogo(1);
+                vistaPaciente.ListaCiudades = objAdministracion.ConsultarDetallesCatalogo(5);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.MessageError = ex.Message;
+            }
+            
             return View("_Paciente", vistaPaciente);
         }
 
-        public JsonResult ConsultarPersona(int idTipoIdentificacion, string identificacion)
+        public JsonResult ConsultarPaciente(int idTipoIdentificacion, string identificacion)
         {
             AdministracionCore objAdministracion = new AdministracionCore();
 
-            var persona = objAdministracion.ConsultarPersona(idTipoIdentificacion, identificacion);
-
-            if (persona != null)
+            try
             {
-                return Json(persona);
-            }
+                var paciente = objAdministracion.ConsultarPaciente(idTipoIdentificacion, identificacion);
 
-            return Json("");
+                if (paciente != null)
+                {
+                    return Json(paciente);
+                }
+                else
+                {
+                    var persona = objAdministracion.ConsultarPersona(idTipoIdentificacion, identificacion);
+
+                    if (persona != null)
+                    {
+                        return Json(persona);
+                    }
+                }
+
+                return Json("");
+            }
+            catch (Exception ex)
+            {
+                return RetornarErrorJsonResult(ex.Message);
+            }
         }
 
         public ActionResult GuardarPaciente(PacienteView vistaPaciente)
@@ -406,32 +435,169 @@ namespace GestionHospital.Controllers
 
             AdministracionCore objAdministracion = new AdministracionCore();
 
-            if (ModelState.IsValid)
-            {
-                Persona persona = new Persona()
-                {
-                    IdTipoIdentificacion = 11,
-                    Identificacion = vistaPaciente.Identificacion,
-                    Nombres = vistaPaciente.Nombres,
-                    Apellidos = vistaPaciente.Apellidos,
-                    FechaNacimiento = vistaPaciente.FechaNacimiento,
-                    Telefono = vistaPaciente.Telefono,
-                    //Celular = vistaPersonal.Celular,
-                    Email = vistaPaciente.Email,
-                    IdGenero = vistaPaciente.IdGenero,
-                    Direccion = vistaPaciente.Direccion,
-                    IdCiudad = vistaPaciente.IdCiudad,
-                };
+            DateTime fechaActual = DateTime.Now;
+            List<DetalleCatalogo> tiposIdentificaciones = new List<DetalleCatalogo>();
+            List<DetalleCatalogo> generos = new List<DetalleCatalogo>();
+            List<DetalleCatalogo> ciudades = new List<DetalleCatalogo>();
 
-                if (vistaPaciente.IdPersona != 0)
-                    objAdministracion.ActualizarPersona(persona);
-                else
-                    objAdministracion.GuardarPersona(persona);
+            try
+            {
+                tiposIdentificaciones = objAdministracion.ConsultarDetallesCatalogo(3);
+
+                if (tiposIdentificaciones != null)
+                    tiposIdentificaciones = tiposIdentificaciones.FindAll(t => t.Parametro1.GetValueOrDefault() == 1);
+
+                generos = objAdministracion.ConsultarDetallesCatalogo(1);
+                ciudades = objAdministracion.ConsultarDetallesCatalogo(5);
+
+                if (ModelState.IsValid)
+                {
+                    Paciente paciente = new Paciente()
+                    {
+                        IdPersona = vistaPaciente.IdPersona,
+                        IdTipoIdentificacion = vistaPaciente.IdTipoIdentificacion,
+                        Identificacion = vistaPaciente.Identificacion,
+                        Nombres = vistaPaciente.Nombres,
+                        Apellidos = vistaPaciente.Apellidos,
+                        FechaNacimiento = vistaPaciente.FechaNacimiento,
+                        Telefono = vistaPaciente.Telefono,
+                        Celular = vistaPaciente.Celular,
+                        Email = vistaPaciente.Email,
+                        IdGenero = vistaPaciente.IdGenero,
+                        Direccion = vistaPaciente.Direccion,
+                        IdCiudad = vistaPaciente.IdCiudad
+                    };
+
+                    objAdministracion.GuardarPaciente(paciente);
+
+                    vistaPaciente = new PacienteView();
+
+                    ModelState.Clear();
+                }
+
+                ViewBag.Message = "Paciente Guardado Correctamente";
+            }
+            catch (Exception ex)
+            {
+                ViewBag.MessageError = ex.Message;
             }
 
-            vistaPaciente.ListaTiposIdentificaciones = objAdministracion.ConsultarDetallesCatalogo(3);
-            vistaPaciente.ListaGeneros = objAdministracion.ConsultarDetallesCatalogo(1);
-            vistaPaciente.ListaCiudades = objAdministracion.ConsultarDetallesCatalogo(5);
+            vistaPaciente.FechaActual = fechaActual;
+            vistaPaciente.ListaTiposIdentificaciones = tiposIdentificaciones;
+            vistaPaciente.ListaGeneros = generos;
+            vistaPaciente.ListaCiudades = ciudades;
+
+            return View("_Paciente", vistaPaciente);
+        }
+
+        public ActionResult ActualizarPaciente(PacienteView vistaPaciente)
+        {
+            ViewBag.Title = "Gestión de pacientes";
+
+            AdministracionCore objAdministracion = new AdministracionCore();
+
+            DateTime fechaActual = DateTime.Now;
+            List<DetalleCatalogo> tiposIdentificaciones = new List<DetalleCatalogo>();
+            List<DetalleCatalogo> generos = new List<DetalleCatalogo>();
+            List<DetalleCatalogo> ciudades = new List<DetalleCatalogo>();
+
+            try
+            {
+                tiposIdentificaciones = objAdministracion.ConsultarDetallesCatalogo(3);
+
+                if (tiposIdentificaciones != null)
+                    tiposIdentificaciones = tiposIdentificaciones.FindAll(t => t.Parametro1.GetValueOrDefault() == 1);
+
+                generos = objAdministracion.ConsultarDetallesCatalogo(1);
+                ciudades = objAdministracion.ConsultarDetallesCatalogo(5);
+
+                if (ModelState.IsValid)
+                {
+                    Paciente paciente = new Paciente()
+                    {
+                        IdPersona = vistaPaciente.IdPersona,
+                        IdTipoIdentificacion = vistaPaciente.IdTipoIdentificacion,
+                        Identificacion = vistaPaciente.Identificacion,
+                        Nombres = vistaPaciente.Nombres,
+                        Apellidos = vistaPaciente.Apellidos,
+                        FechaNacimiento = vistaPaciente.FechaNacimiento,
+                        Telefono = vistaPaciente.Telefono,
+                        Celular = vistaPaciente.Celular,
+                        Email = vistaPaciente.Email,
+                        IdGenero = vistaPaciente.IdGenero,
+                        Direccion = vistaPaciente.Direccion,
+                        IdCiudad = vistaPaciente.IdCiudad,
+                        EstadoTipo = vistaPaciente.Estado == 1
+                    };
+
+                    objAdministracion.ActualizarPaciente(paciente);
+
+                    vistaPaciente = new PacienteView();
+
+                    ModelState.Clear();
+                }
+
+                ViewBag.Message = "Paciente Actualizado Correctamente";
+            }
+            catch (Exception ex)
+            {
+                ViewBag.MessageError = ex.Message;
+            }
+
+            vistaPaciente.FechaActual = fechaActual;
+            vistaPaciente.ListaTiposIdentificaciones = tiposIdentificaciones;
+            vistaPaciente.ListaGeneros = generos;
+            vistaPaciente.ListaCiudades = ciudades;
+
+            return View("_Paciente", vistaPaciente);
+        }
+
+        public ActionResult EliminarPaciente(PacienteView vistaPaciente)
+        {
+            ViewBag.Title = "Gestión de pacientes";
+
+            AdministracionCore objAdministracion = new AdministracionCore();
+
+            DateTime fechaActual = DateTime.Now;
+            List<DetalleCatalogo> tiposIdentificaciones = new List<DetalleCatalogo>();
+            List<DetalleCatalogo> generos = new List<DetalleCatalogo>();
+            List<DetalleCatalogo> ciudades = new List<DetalleCatalogo>();
+
+            try
+            {
+                tiposIdentificaciones = objAdministracion.ConsultarDetallesCatalogo(3);
+
+                if (tiposIdentificaciones != null)
+                    tiposIdentificaciones = tiposIdentificaciones.FindAll(t => t.Parametro1.GetValueOrDefault() == 1);
+
+                generos = objAdministracion.ConsultarDetallesCatalogo(1);
+                ciudades = objAdministracion.ConsultarDetallesCatalogo(5);
+
+                if (ModelState.IsValid)
+                {
+                    Paciente paciente = new Paciente()
+                    {
+                        IdPersona = vistaPaciente.IdPersona
+                    };
+
+                    objAdministracion.EliminarPaciente(paciente);
+
+                    vistaPaciente = new PacienteView();
+
+                    ModelState.Clear();
+                }
+
+                ViewBag.Message = "Paciente Eliminado Correctamente";
+            }
+            catch (Exception ex)
+            {
+                ViewBag.MessageError = ex.Message;
+            }
+
+            vistaPaciente.FechaActual = fechaActual;
+            vistaPaciente.ListaTiposIdentificaciones = tiposIdentificaciones;
+            vistaPaciente.ListaGeneros = generos;
+            vistaPaciente.ListaCiudades = ciudades;
 
             return View("_Paciente", vistaPaciente);
         }

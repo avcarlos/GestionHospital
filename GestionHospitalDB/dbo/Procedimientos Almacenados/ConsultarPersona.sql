@@ -5,11 +5,12 @@
 AS
 
 SELECT	Persona.*, 
-		TipoPersona.IdTipoPersona
+		TipoPersona.IdTipo,
+		TipoPersona.Estado AS 'EstadoTipo'
 FROM	Persona
-		JOIN TipoPersona ON Persona.IdPersona = TipoPersona.IdPersona
+		LEFT JOIN TipoPersona ON Persona.IdPersona = TipoPersona.IdPersona
 WHERE	Persona.IdTipoIdenticacion = @i_id_tipo_identificacion
   AND	Persona.Identificacion = @i_identificacion
-  AND	TipoPersona.IdTipoPersona = ISNULL(@i_id_tipo_persona, TipoPersona.IdTipoPersona)
+  AND	ISNULL(TipoPersona.IdTipo, 0) = ISNULL(@i_id_tipo_persona, ISNULL(TipoPersona.IdTipo, 0))
 
 RETURN 0

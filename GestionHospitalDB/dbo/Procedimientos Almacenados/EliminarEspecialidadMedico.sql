@@ -3,8 +3,8 @@
 	@i_id_especialidad	int
 AS
 
-DELETE
-FROM	dbo.EspecialidadMedico
+UPDATE	dbo.EspecialidadMedico
+SET		Estado = 0
 WHERE	IdMedico = @i_id_medico
   AND	IdEspecialidad = @i_id_especialidad
 

@@ -7,5 +7,6 @@ SELECT	dbo.EspecialidadMedico.*,
 FROM	dbo.EspecialidadMedico
 		JOIN dbo.Especialidad ON dbo.EspecialidadMedico.IdEspecialidad = dbo.Especialidad.IdEspecialidad
 WHERE	IdMedico = @i_id_medico
+  AND	dbo.EspecialidadMedico.Estado = 1
 
 RETURN 0

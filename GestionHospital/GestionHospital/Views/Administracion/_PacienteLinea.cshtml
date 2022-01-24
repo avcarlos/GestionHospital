@@ -1,0 +1,106 @@
+﻿@using GestionHospital.Models.Administracion
+@model PacienteView
+@{ 
+    var identificacion = ViewData.TemplateInfo.GetFullHtmlFieldId("Identificacion");
+}
+<h2>@ViewBag.Title.</h2>
+<div class="row">
+    <div class="col-md-11">
+        <section id="medicoForm">
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $('#@identificacion').change(
+                        function (event) {
+                            var identificacionParam = $('#@identificacion').val();
+
+                            $.ajax({
+                                type: "POST",
+                                url: '@Url.Action("ConsultarPersona", "Administracion")',
+                                data: { idTipoIdentificacion: 11, identificacion: identificacionParam },
+                                success: function (result) {
+                                    if (result != "") {
+                                        alert('Paciente existente');
+
+                                        $('#Nombres').val(result.Nombres);
+                                        $('#Apellidos').val(result.Apellidos);
+                                        $('#Email').val(result.Email);
+                                        $('#Telefono').val(result.Telefono);
+                                        $('#Direccion').val(result.Direccion);
+                                        $('#IdCiudad').data('kendoDropDownList').value(result.IdCiudad);
+                                        $('#IdGenero').data('kendoDropDownList').value(result.IdGenero);
+                                        $('#FechaNacimiento').data('kendoDatePicker').value(result.FechaNacimiento);
+                                    }
+                                },
+                                error: function (err) {
+                                    if (mostrarMensajeErrorAjax(err)) {
+                                        alert('Error al consultar paciente: ' + err.statusText);
+                                    }
+                                }
+                            });
+                        }
+                    );
+                })
+
+                function mostrarError() {
+                    alert('Error');
+                }
+            </script>
+            @using (Html.BeginForm("GuardarPacienteLinea", "Administracion"))
+            {
+                @Html.AntiForgeryToken()
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <table style="width: 80%">
+                    <tr>
+                        <td>
+                            Identificación:
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.Identificacion, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Identificacion, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Nombres:
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.Nombres, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Nombres, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Apellidos:
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.Apellidos, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Apellidos, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Correo Electrónico:
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                </table>
+                <hr />
+                <table>
+                    <tr>
+                        <td>
+                            <input type="submit" value="Guardar" class="btn btn-default" />
+                            @*<input type="button" value="Eliminar" class="btn btn-default" onclick="" />*@
+                            <input type="button" value="Limpiar" class="btn btn-default" onclick="submitFormNoValidation('@Url.Action("Paciente", "Administracion")', this)" />
+                        </td>
+                    </tr>
+                </table>
+                @Html.HiddenFor(m => m.IdPersona)
+                @Html.HiddenFor(m => m.FechaActual)
+            }
+        </section>
+    </div>
+</div>

@@ -7,5 +7,9 @@
         public int IdDetalleCatalogo { get; set; }
 
         public string Nombre { get; set; }
+
+        public int? Parametro1 { get; set; }
+
+        public string Parametro2 { get; set; }
     }
 }

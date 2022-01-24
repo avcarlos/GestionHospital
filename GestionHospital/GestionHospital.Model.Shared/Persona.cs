@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GestionHospital.Model.Shared
 {
@@ -27,5 +28,13 @@ namespace GestionHospital.Model.Shared
         public string Direccion { get; set; }
 
         public int IdCiudad { get; set; }
+
+        public int IdTipo {get; set;}
+
+        public bool Estado { get; set; }
+
+        public bool EstadoTipo { get; set; }
+
+        public List<TipoPersona> TiposPersona { get; set; }
     }
 }

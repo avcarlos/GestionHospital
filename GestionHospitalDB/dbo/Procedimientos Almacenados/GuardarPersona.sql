@@ -9,7 +9,8 @@
 	@i_email				varchar(30) = NULL,
 	@i_id_genero			int = NULL,
 	@i_direccion			varchar(300) = NULL,
-	@i_id_ciudad			int = NULL
+	@i_id_ciudad			int = NULL,
+	@o_id_persona			int out
 AS
 
 INSERT INTO Persona
@@ -42,5 +43,7 @@ VALUES
 	@i_id_ciudad,
 	1
 )
+
+SET @o_id_persona = SCOPE_IDENTITY()
 
 RETURN 0

@@ -7,5 +7,7 @@
         public int IdPersona { get; set; }
 
         public int IdTipo { get; set; }
+
+        public bool Estado { get; set; }
     }
 }

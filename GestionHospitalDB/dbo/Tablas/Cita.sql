@@ -11,7 +11,7 @@
 	[Examenes]				VARCHAR(300)		NULL,
 	[Receta]				VARCHAR(300)		NULL,
 	[FechaProximoControl]	DATETIME			NULL,
-	[Estado]				INT					NULL,
+	[IdEstado]				INT					NULL,
 	CONSTRAINT [PK_Cita] PRIMARY KEY (IdCita),
 	CONSTRAINT [FK_IdPersona] FOREIGN KEY (IdPaciente) REFERENCES Persona(IdPersona)
 )

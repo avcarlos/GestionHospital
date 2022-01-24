@@ -5,12 +5,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GestionHospital.Models.Administracion
 {
-    public class PersonalMedicoView
+    public class PacienteView
     {
         public int IdPersona { get; set; }
-
-        [Required]
-        public int IdTipoIdentificacion { get; set; }
 
         [Required]
         public string Identificacion { get; set; }
@@ -36,13 +33,7 @@ namespace GestionHospital.Models.Administracion
 
         public int IdCiudad { get; set; }
 
-        public int IdEspecialidad { get; set; }
-
-        public int Estado { get; set; }
-
-        public int IdTipoPersona { get; set; }
-
-        public List<Especialidad> ListaEspecialidades { get; set; }
+        public bool Estado { get; set; }
 
         public List<DetalleCatalogo> ListaTiposIdentificaciones { get; set; }
 
@@ -52,9 +43,8 @@ namespace GestionHospital.Models.Administracion
 
         public DateTime FechaActual { get; set; }
 
-        public PersonalMedicoView()
+        public PacienteView()
         {
-            ListaEspecialidades = new List<Especialidad>();
             ListaTiposIdentificaciones = new List<DetalleCatalogo>();
             ListaGeneros = new List<DetalleCatalogo>();
             ListaCiudades = new List<DetalleCatalogo>();

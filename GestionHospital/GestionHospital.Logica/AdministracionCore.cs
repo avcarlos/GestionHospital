@@ -6,6 +6,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace GestionHospital.Logica
 {
@@ -24,7 +25,7 @@ namespace GestionHospital.Logica
                 objData.CreateParameter("@i_id_catalogo", SqlDbType.Int, 4, idCatalogo)
             };
 
-            var detalles = objData.ConsultarDatos<DetalleCatalogo>("ConsultarUsuario", parameters);
+            var detalles = objData.ConsultarDatos<DetalleCatalogo>("ConsultarDetalleCatalogo", parameters);
 
             return detalles;
         }
@@ -46,7 +47,7 @@ namespace GestionHospital.Logica
             if (idCatalogo != 0)
                 parameters[0].Value = idCatalogo;
 
-            var detalles = objData.ConsultarDatos<DetalleCatalogo>("ConsultarUsuario", parameters);
+            var detalles = objData.ConsultarDatos<DetalleCatalogo>("ConsultarDe talleCatalogo", parameters);
 
             if (detalles != null && detalles.Count() > 0)
                 detalle = detalles.FirstOrDefault();
@@ -58,17 +59,21 @@ namespace GestionHospital.Logica
 
         #region Persona
 
-        public Persona ConsultarPersona(int idTipoIdentificacion, string identificacion)
+        public Persona ConsultarPersona(int idTipoIdentificacion, string identificacion, int? idTipoPersona = null)
         {
             var objData = GetConnection();
 
             Persona persona = null;
 
-            IDbDataParameter[] parameters = new IDbDataParameter[2]
+            IDbDataParameter[] parameters = new IDbDataParameter[3]
             {
                 objData.CreateParameter("@i_id_tipo_identificacion", SqlDbType.Int, 4, idTipoIdentificacion),
-                objData.CreateParameter("@i_identificacion", SqlDbType.VarChar, 13, identificacion)
+                objData.CreateParameter("@i_identificacion", SqlDbType.VarChar, 13, identificacion),
+                objData.CreateParameter("@i_id_tipo_persona", SqlDbType.Int, 4)
             };
+
+            if (idTipoPersona != null)
+                parameters[2].Value = idTipoPersona.GetValueOrDefault();
 
             var personas = objData.ConsultarDatos<Persona>("ConsultarPersona", parameters);
 
@@ -78,11 +83,11 @@ namespace GestionHospital.Logica
             return persona;
         }
 
-        public void GuardarPersona(Persona persona)
+        public int GuardarPersona(Persona persona)
         {
             var objData = GetConnection();
 
-            IDbDataParameter[] parameters = new IDbDataParameter[11]
+            IDbDataParameter[] parameters = new IDbDataParameter[12]
             {
                 objData.CreateParameter("@i_identificacion", SqlDbType.VarChar, 13, persona.Identificacion),
                 objData.CreateParameter("@i_id_tipo_identicacion", SqlDbType.Int, 4, persona.IdTipoIdentificacion),
@@ -94,10 +99,11 @@ namespace GestionHospital.Logica
                 objData.CreateParameter("@i_email", SqlDbType.VarChar, 30),
                 objData.CreateParameter("@i_id_genero", SqlDbType.Int, 4),
                 objData.CreateParameter("@i_direccion", SqlDbType.VarChar, 300),
-                objData.CreateParameter("@i_id_ciudad", SqlDbType.Int, 4)
+                objData.CreateParameter("@i_id_ciudad", SqlDbType.Int, 4),
+                objData.CreateParameter("@o_id_persona", SqlDbType.Int, 4, ParameterDirection.Output)
             };
 
-            if(persona.FechaNacimiento != null)
+            if (persona.FechaNacimiento != null)
                 parameters[4].Value = persona.FechaNacimiento.GetValueOrDefault();
             if (!string.IsNullOrEmpty(persona.Telefono))
                 parameters[5].Value = persona.Telefono;
@@ -112,7 +118,9 @@ namespace GestionHospital.Logica
             if (persona.IdCiudad != 0)
                 parameters[10].Value = persona.IdCiudad;
 
-            objData.Insert("GuardarPersona", CommandType.StoredProcedure, parameters);
+            var idPersona = objData.Insert("GuardarPersona", CommandType.StoredProcedure, parameters);
+
+            return idPersona;
         }
 
         public void ActualizarPersona(Persona persona)
@@ -127,7 +135,7 @@ namespace GestionHospital.Logica
                     objData.CreateParameter("@i_fecha_nacimiento", SqlDbType.DateTime, 8),
                     objData.CreateParameter("@i_telefono", SqlDbType.VarChar, 12),
                     objData.CreateParameter("@i_celular", SqlDbType.VarChar, 12),
-                    objData.CreateParameter("@i_email", SqlDbType.Int, 30),
+                    objData.CreateParameter("@i_email", SqlDbType.VarChar, 30),
                     objData.CreateParameter("@i_id_genero", SqlDbType.Int, 4),
                     objData.CreateParameter("@i_direccion", SqlDbType.VarChar, 300),
                     objData.CreateParameter("@i_id_ciudad", SqlDbType.Int, 4)
@@ -178,9 +186,141 @@ namespace GestionHospital.Logica
             return tipos;
         }
 
+        public void GuardarTipoPersona(TipoPersona tipoPersona)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[2]
+            {
+                objData.CreateParameter("@i_id_persona", SqlDbType.Int, 4, tipoPersona.IdPersona),
+                objData.CreateParameter("@i_id_tipo", SqlDbType.Int, 4, tipoPersona.IdTipo)
+            };
+
+            objData.Insert("GuardarTipoPersona", CommandType.StoredProcedure, parameters);
+        }
+
+        public void EliminarTipoPersona(TipoPersona tipoPersona)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[2]
+            {
+                objData.CreateParameter("@i_id_persona", SqlDbType.Int, 4, tipoPersona.IdPersona),
+                objData.CreateParameter("@i_id_tipo", SqlDbType.Int, 4, tipoPersona.IdTipo)
+            };
+
+            objData.Delete("EliminarTipoPersona", CommandType.StoredProcedure, parameters);
+        }
+
         #endregion
 
         #region Medico
+
+        public Medico ConsultarMedico(int idTipoIdentificacion, string identificacion)
+        {
+            Medico medico = ConsultarDatosMedico(idTipoIdentificacion, identificacion);
+
+            if (medico != null)
+            {
+                medico.Especialidades = ConsultarEspecialidadesMedico(medico.IdPersona);
+            }
+
+            return medico;
+        }
+
+        public Medico ConsultarDatosMedico(int idTipoIdentificacion, string identificacion)
+        {
+            var objData = GetConnection();
+
+            Medico medico = null;
+
+            IDbDataParameter[] parameters = new IDbDataParameter[3]
+            {
+                objData.CreateParameter("@i_id_tipo_identificacion", SqlDbType.Int, 4, idTipoIdentificacion),
+                objData.CreateParameter("@i_identificacion", SqlDbType.VarChar, 13, identificacion),
+                objData.CreateParameter("@i_id_tipo_persona", SqlDbType.Int, 4, 5)
+            };
+
+            var medicos = objData.ConsultarDatos<Medico>("ConsultarPersona", parameters);
+
+            if (medicos != null && medicos.Count() > 0)
+                medico = medicos.FirstOrDefault();
+
+            return medico;
+        }
+
+        public void GuardarMedico(Medico medico)
+        {
+            using (TransactionScope tran = new TransactionScope(TransactionScopeOption.Required))
+            {
+                if (medico.IdPersona == 0)
+                    medico.IdPersona = GuardarPersona(medico);
+                else
+                    ActualizarPersona(medico);
+
+                GuardarTipoPersona(new TipoPersona() { IdPersona = medico.IdPersona, IdTipo = 5 });
+
+                if (medico.Especialidades != null && medico.Especialidades.Count() > 0)
+                {
+                    foreach (var item in medico.Especialidades)
+                    {
+                        item.IdMedico = medico.IdPersona;
+
+                        GuardarEspecialidadMedico(item);
+                    }
+                }
+
+                tran.Complete();
+            }
+        }
+
+        public void ActualizarMedico(Medico medico)
+        {
+            using (TransactionScope tran = new TransactionScope(TransactionScopeOption.Required))
+            {
+                ActualizarPersona(medico);
+
+                var tipos = ConsultarTiposPersona(medico.IdPersona);
+                var tipoMedico = tipos.FirstOrDefault(t => t.IdTipo == 5);
+
+                if (!tipoMedico.Estado && medico.EstadoTipo)
+                    GuardarTipoPersona(new TipoPersona() { IdPersona = medico.IdPersona, IdTipo = 5 });
+
+                if (medico.Especialidades != null && medico.Especialidades.Count() > 0)
+                {
+                    var especialidadesIniciales = ConsultarEspecialidadesMedico(medico.IdPersona);
+
+                    var especialidadesGuardar = medico.Especialidades.FindAll(e => !especialidadesIniciales.Exists(i => i.IdEspecialidad == e.IdEspecialidad));
+                    var especialidadesEliminar = especialidadesIniciales.FindAll(i => !medico.Especialidades.Exists(e => e.IdEspecialidad == i.IdEspecialidad));
+
+                    foreach (var item in especialidadesGuardar)
+                    {
+                        item.IdMedico = medico.IdPersona;
+
+                        GuardarEspecialidadMedico(item);
+                    }
+
+                    foreach (var item in especialidadesEliminar)
+                    {
+                        item.IdMedico = medico.IdPersona;
+
+                        EliminarEspecialidadMedico(item);
+                    }
+                }
+
+                tran.Complete();
+            }
+        }
+
+        public void EliminarMedico(Medico medico)
+        {
+            using (TransactionScope tran = new TransactionScope(TransactionScopeOption.Required))
+            {
+                EliminarTipoPersona(new TipoPersona() { IdPersona = medico.IdPersona, IdTipo = 5 });
+
+                tran.Complete();
+            }
+        }
 
         public List<Especialidad> ConsultarEspecialidadesMedico(int idMedico)
         {

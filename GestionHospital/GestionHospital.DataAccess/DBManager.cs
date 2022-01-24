@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Reflection;
 
 namespace GestionHospital.DataAccess
@@ -138,8 +139,10 @@ namespace GestionHospital.DataAccess
             }
         }
 
-        public void Insert(string commandText, CommandType commandType, IDbDataParameter[] parameters)
+        public int Insert(string commandText, CommandType commandType, IDbDataParameter[] parameters)
         {
+            int idObject = 0;
+
             using (var connection = database.CreateConnection())
             {
                 connection.Open();
@@ -155,59 +158,21 @@ namespace GestionHospital.DataAccess
                     }
 
                     command.ExecuteNonQuery();
-                }
-            }
-        }
 
-        public int Insert(string commandText, CommandType commandType, IDbDataParameter[] parameters, out int lastId)
-        {
-            lastId = 0;
-
-            using (var connection = database.CreateConnection())
-            {
-                connection.Open();
-
-                using (var command = database.CreateCommand(commandText, commandType, connection))
-                {
-                    if (parameters != null)
+                    foreach(var par in command.Parameters)
                     {
-                        foreach (var parameter in parameters)
+                        var datoSql = (SqlParameter)par;
+
+                        if (datoSql.Direction == ParameterDirection.Output)
                         {
-                            command.Parameters.Add(parameter);
+                            if(datoSql.SqlDbType == SqlDbType.Int)
+                            idObject = (int)datoSql.Value;
                         }
                     }
-
-                    object newId = command.ExecuteScalar();
-                    lastId = Convert.ToInt32(newId);
                 }
             }
 
-            return lastId;
-        }
-
-        public long Insert(string commandText, CommandType commandType, IDbDataParameter[] parameters, out long lastId)
-        {
-            lastId = 0;
-            using (var connection = database.CreateConnection())
-            {
-                connection.Open();
-
-                using (var command = database.CreateCommand(commandText, commandType, connection))
-                {
-                    if (parameters != null)
-                    {
-                        foreach (var parameter in parameters)
-                        {
-                            command.Parameters.Add(parameter);
-                        }
-                    }
-
-                    object newId = command.ExecuteScalar();
-                    lastId = Convert.ToInt64(newId);
-                }
-            }
-
-            return lastId;
+            return idObject;
         }
 
         public void InsertWithTransaction(string commandText, CommandType commandType, IDbDataParameter[] parameters)
@@ -392,10 +357,45 @@ namespace GestionHospital.DataAccess
             }
         }
 
+        public IDbDataParameter[] Execute(string commandText, CommandType commandType, IDbDataParameter[] parameters)
+        {
+            List<IDbDataParameter> resultado = new List<IDbDataParameter>();
+
+            using (var connection = database.CreateConnection())
+            {
+                connection.Open();
+
+                using (var command = database.CreateCommand(commandText, commandType, connection))
+                {
+                    if (parameters != null)
+                    {
+                        foreach (var parameter in parameters)
+                        {
+                            command.Parameters.Add(parameter);
+                        }
+                    }
+
+                    command.ExecuteNonQuery();
+
+                    foreach (var par in command.Parameters)
+                    {
+                        var datoSql = (SqlParameter)par;
+
+                        if (datoSql.Direction == ParameterDirection.Output)
+                        {
+                            resultado.Add(datoSql);
+                        }
+                    }
+                }
+            }
+
+            return resultado.ToArray();
+        }
+
         private static List<T> ConvertDataTable<T>(DataTable dt)
         {
             List<T> data = new List<T>();
-            
+
             foreach (DataRow row in dt.Rows)
             {
                 T item = GetItem<T>(row);
@@ -415,7 +415,10 @@ namespace GestionHospital.DataAccess
                 foreach (PropertyInfo pro in temp.GetProperties())
                 {
                     if (pro.Name == column.ColumnName)
-                        pro.SetValue(obj, dr[column.ColumnName], null);
+                        if (!dr[column.ColumnName].Equals(System.DBNull.Value))
+                            pro.SetValue(obj, dr[column.ColumnName], null);
+                        else
+                            pro.SetValue(obj, null, null);
                     else
                         continue;
                 }

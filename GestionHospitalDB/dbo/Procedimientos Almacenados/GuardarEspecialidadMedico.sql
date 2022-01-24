@@ -11,13 +11,22 @@ BEGIN
 	INSERT INTO dbo.EspecialidadMedico
 	(
 		IdMedico,
-		IdEspecialidad
+		IdEspecialidad,
+		Estado
 	)
 	VALUES
 	(
 		@i_id_medico,
-		@i_id_especialidad
+		@i_id_especialidad,
+		1
 	)
+END
+ELSE
+BEGIN
+	UPDATE	dbo.EspecialidadMedico
+	SET		Estado = 1
+	WHERE	IdMedico = @i_id_medico
+	  AND	IdEspecialidad = @i_id_especialidad
 END
 
 RETURN 0

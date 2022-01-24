@@ -72,7 +72,7 @@
     <Build Include="dbo\Tablas\Persona.sql" />
     <Build Include="dbo\Tablas\Especialidad.sql" />
     <Build Include="dbo\Tablas\EspecialidadMedico.sql" />
-    <Build Include="dbo\Tablas\TiempoConsulta.sql" />
+    <Build Include="dbo\Tablas\Horario.sql" />
     <Build Include="dbo\Tablas\Factura.sql" />
     <Build Include="dbo\Tablas\Cita.sql" />
     <Build Include="dbo\Tablas\TipoPersona.sql" />
@@ -90,6 +90,8 @@
     <Build Include="dbo\Procedimientos Almacenados\ConsultarEspecialidadesMedico.sql" />
     <Build Include="dbo\Procedimientos Almacenados\GuardarEspecialidadMedico.sql" />
     <Build Include="dbo\Procedimientos Almacenados\EliminarEspecialidadMedico.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\GuardarTipoPersona.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\EliminarTipoPersona.sql" />
   </ItemGroup>
   <ItemGroup>
     <PreDeploy Include="Scripts\PreDeployment\Script.PreDeployment.sql" />

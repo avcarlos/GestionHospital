@@ -16,8 +16,8 @@ FROM	Cita
 WHERE	Cita.IdPaciente = ISNULL(@i_id_paciente, Cita.IdPaciente)
   AND	Cita.IdEstado = ISNULL(@i_id_estado, Cita.IdEstado)
   AND	Cita.Fecha = ISNULL(@i_fecha, Cita.Fecha)
-  AND	Cita.FechaProximoControl = ISNULL(@i_fecha_proximo_control, FechaProximoControl)
+  AND	ISNULL(Cita.FechaProximoControl, 0) = ISNULL(@i_fecha_proximo_control, ISNULL(Cita.FechaProximoControl, 0))
   AND	EspecialidadMedico.IdMedico = ISNULL(@i_id_medico, EspecialidadMedico.IdMedico)
-  AND	EspecialidadMedico.IdEspecialidad = ISNULL(@i_id_medico, EspecialidadMedico.IdEspecialidad)
+  AND	EspecialidadMedico.IdEspecialidad = ISNULL(@i_id_especialidad, EspecialidadMedico.IdEspecialidad)
 
 RETURN 0

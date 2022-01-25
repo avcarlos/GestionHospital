@@ -62,7 +62,7 @@ namespace GestionHospital.Controllers
             return View("_AgendamientoCitas", vistaAgendamiento);
         }
 
-        public JsonResult ConsultarPaciente(string identificacion)
+        public JsonResult ConsultarPacienteCita(string identificacion)
         {
             AdministracionCore objAdministracion = new AdministracionCore();
 
@@ -113,6 +113,8 @@ namespace GestionHospital.Controllers
 
                 if (citasPendientes == null)
                     citasPendientes = new List<CitaMedica>();
+                else
+                    citasPendientes = citasPendientes.OrderBy(c => c.Fecha).OrderBy(c => c.IdHorario).ToList();
 
                 return Json(citasPendientes.ToDataSourceResult(request));
             }
@@ -133,7 +135,7 @@ namespace GestionHospital.Controllers
                 if (especialidades == null)
                     especialidades = new List<Especialidad>();
                 else
-                    especialidades = especialidades.FindAll(e => e.Estado);
+                    especialidades = especialidades.FindAll(e => e.Estado).OrderBy(e => e.IdEspecialidad).ToList();
 
                 return Json(especialidades, JsonRequestBehavior.AllowGet);
             }
@@ -153,6 +155,8 @@ namespace GestionHospital.Controllers
 
                 if (medicos == null)
                     medicos = new List<Medico>();
+                else
+                    medicos = medicos.OrderBy(m => m.NombreMedico).ToList();
 
                 return Json(medicos, JsonRequestBehavior.AllowGet);
             }
@@ -162,16 +166,25 @@ namespace GestionHospital.Controllers
             }
         }
 
-        public JsonResult ConsultarHorariosCita(int idMedico, DateTime? fecha)
+        public JsonResult ConsultarHorariosCita(int idPaciente, int idMedico, string fechaCita, int idCita)
         {
             ProcesosCore objProcesos = new ProcesosCore();
 
             try
             {
-                var horarios = objProcesos.ConsultarHorariosDisponiblesCita(idMedico, fecha.GetValueOrDefault());
+                List<Horario> horarios = null;
+
+                if (!string.IsNullOrEmpty(fechaCita))
+                {
+                    var fecha = Convert.ToDateTime(fechaCita);
+
+                    horarios = objProcesos.ConsultarHorariosDisponiblesCita(idPaciente, idMedico, fecha, idCita);
+                }
 
                 if (horarios == null)
                     horarios = new List<Horario>();
+                else
+                    horarios = horarios.OrderBy(h => h.HoraInicio).ToList();
 
                 return Json(horarios, JsonRequestBehavior.AllowGet);
             }
@@ -200,7 +213,7 @@ namespace GestionHospital.Controllers
                         IdPaciente = vistaAgendamiento.IdPersona,
                         IdEspecialidad = vistaAgendamiento.IdEspecialidad,
                         IdMedico = vistaAgendamiento.IdMedico,
-                        Fecha = vistaAgendamiento.FechaCita,
+                        Fecha = vistaAgendamiento.FechaCita.GetValueOrDefault(),
                         IdHorario = vistaAgendamiento.IdHoraCita,
                         Motivo = vistaAgendamiento.Motivo,
                         IdEstado = 15
@@ -248,7 +261,7 @@ namespace GestionHospital.Controllers
                         IdPaciente = vistaAgendamiento.IdPersona,
                         IdEspecialidad = vistaAgendamiento.IdEspecialidad,
                         IdMedico = vistaAgendamiento.IdMedico,
-                        Fecha = vistaAgendamiento.FechaCita,
+                        Fecha = vistaAgendamiento.FechaCita.GetValueOrDefault(),
                         IdHorario = vistaAgendamiento.IdHoraCita,
                         Motivo = vistaAgendamiento.Motivo,
                         IdEstado = 15

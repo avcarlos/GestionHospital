@@ -2,6 +2,9 @@
 @model AgendamientoCitasView
 @{
     var identificacion = ViewData.TemplateInfo.GetFullHtmlFieldId("Identificacion");
+    var idEspecialidad = ViewData.TemplateInfo.GetFullHtmlFieldId("IdEspecialidad");
+    var idMedico = ViewData.TemplateInfo.GetFullHtmlFieldId("IdMedico");
+    var idHorario = ViewData.TemplateInfo.GetFullHtmlFieldId("IdHoraCita");
 }
 <h2>@ViewBag.Title.</h2>
 <h4 id="mensajeError" class="text-danger" style="display:@(string.IsNullOrEmpty(ViewBag.MessageError) ? "none" : string.Empty)">@ViewBag.MessageError.</h4>
@@ -41,11 +44,12 @@
                             $('#IdCita').val(0);
                             $('#IdPersona').val(0);
                             $('#NombrePaciente').val('');
-                            $('#FechaCita').data('kendoDatePicker').value();
                             $('#Motivo').val('');
-                            $('#IdEspecialidad').data('kendoDropDownList').value();
-                            $('#IdMedico').data('kendoDropDownList').value();
-                            $('#IdHoraCita').data('kendoDropDownList').value();
+                            $('#@idEspecialidad').val(0);
+                            $('#@idMedico').val(0);
+                            $('#@idHorario').val(0);
+
+                            $('#dropDownEspecialidad').data('kendoDropDownList').dataSource.read();
 
                             if (identificacionParam == "")
                                 return;
@@ -54,7 +58,7 @@
 
                             $.ajax({
                                 type: "POST",
-                                url: '@Url.Action("ConsultarPacienteCita", "Administracion")',
+                                url: '@Url.Action("ConsultarPacienteCita", "Procesos")',
                                 data: { identificacion: identificacionParam },
                                 success: function (result) {
                                     if (result != "") {
@@ -80,7 +84,7 @@
                 })
 
                 function cargarGridCitas() {
-                    var idPersonaParam = $('#idPersona').val();
+                    var idPersonaParam = $('#IdPersona').val();
 
                     $('#GridCitas').data('kendoGrid').dataSource.read({ IdPaciente: idPersonaParam });
                 }
@@ -102,14 +106,21 @@
                     $('#IdCita').val(selectedRow.IdCita);
                     $('#FechaCita').data('kendoDatePicker').value(selectedRow.Fecha);
                     $('#Motivo').val(selectedRow.Motivo);
-                    $('#IdEspecialidad').data('kendoDropDownList').value(selectedRow.IdEspecialidad);
-                    $('#IdMedico').data('kendoDropDownList').value(selectedRow.IdMedico);
-                    $('#IdHoraCita').data('kendoDropDownList').value(selectedRow.IdHorario);
+
+                    $('#dropDownEspecialidad').data('kendoDropDownList').value(selectedRow.IdEspecialidad);
+
+                    $('#dropDownMedico').data('kendoDropDownList').dataSource.read({ idEspecialidad: selectedRow.IdEspecialidad });
+
+                    setTimeout(function () {
+                        $('#dropDownMedico').data('kendoDropDownList').value(selectedRow.IdMedico);
+                        setTimeout(function () {
+                            $('#dropDownHorario').data('kendoDropDownList').value(selectedRow.IdHorario);
+                        }, 1000);
+                    }, 1000);
                 }
 
                 function validarMaximoCitas() {
-                    debugger;
-                    var grid = $("#GridOrdenesPago").data("kendoGrid");
+                    var grid = $("#GridCitas").data("kendoGrid");
                     var data = grid.dataSource.data();
                     var len = data.length;
 
@@ -126,19 +137,35 @@
                 }
 
                 function consultarHorariosDisponibles(e) {
-                    debugger;
+                    var idPersonaParam = $('#IdPersona').val();
                     var idMedicoParam = $('#dropDownMedico').data('kendoDropDownList').value();
-                    var fechaParam = e.sender._value;
+                    var fechaParam = $('#FechaCita').val();
+                    var idCitaParam = $('#IdCita').val();
 
-                    $('#dropDownHorario').data('kendoDropDownList').dataSource.read({ idMedico: idMedicoParam, fecha: fechaParam });
+                    $('#dropDownHorario').data('kendoDropDownList').dataSource.read({ idPaciente: idPersonaParam, idMedico: idMedicoParam, fechaCita: fechaParam, idCita: idCitaParam });
                 }
 
                 function filtrarDatosConsultaHorarios() {
-                    debugger;
+                    var idPersonaParam = $('#IdPersona').val();
                     var idMedicoParam = $('#dropDownMedico').data('kendoDropDownList').value();
-                    var fechaParam = e.sender._value;
+                    var fechaParam = $('#FechaCita').val();
+                    var idCitaParam = $('#IdCita').val();
 
-                    return { idMedico: idMedicoParam, fecha: fechaParam };
+                    return { idPaciente: idPersonaParam, idMedico: idMedicoParam, fechaCita: fechaParam, idCita: idCitaParam };
+                }
+
+                function onDataBindingDropDown() {
+                    var idEspecialidadParam = $('#dropDownEspecialidad').data('kendoDropDownList')
+                    if (idEspecialidadParam != undefined)
+                        $('#@idEspecialidad').val($('#dropDownEspecialidad').data('kendoDropDownList').value());
+
+                    var idMedicoParam = $('#dropDownMedico').data('kendoDropDownList')
+                    if (idMedicoParam != undefined)
+                        $('#@idMedico').val($('#dropDownMedico').data('kendoDropDownList').value());
+
+                    var idHorarioParam = $('#dropDownHorario').data('kendoDropDownList')
+                    if (idHorarioParam != undefined)
+                        $('#@idHorario').val($('#dropDownHorario').data('kendoDropDownList').value());
                 }
             </script>
             @using (Html.BeginForm())
@@ -178,7 +205,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="2">
+                        <td colspan="3">
                             @(
                                 Html.Kendo()
                                 .Grid<GestionHospital.Model.Shared.CitaMedica>()
@@ -192,13 +219,14 @@
                                     c.Bound(col => col.IdHorario).Hidden();
                                     c.Bound(col => col.NombreEspecialidad).Title("Especialidad");
                                     c.Bound(col => col.NombreMedico).Title("Médico");
-                                    c.Bound(col => col.Fecha).Title("Tipo Pago").Format("{0:dd/MM/yyyy}");
+                                    c.Bound(col => col.Fecha).Title("Fecha").Format("{0:dd/MM/yyyy}");
                                     c.Bound(col => col.NombreHorario).Title("Horario");
                                 })
                                 .Selectable()
                                 .DataSource(dataBinding => dataBinding.Ajax()
                                     .Read("CargarCitasPendientesPaciente", "Procesos", new { idPaciente = Model.IdPersona}))
                                 .Events(events => events.Change("onRowSelectedCita").DataBound("validarMaximoCitas"))
+                                .AutoBind(false)
                             )
                         </td>
                     </tr>
@@ -212,7 +240,9 @@
 	                            .DataTextField("Nombre")
 	                            .DataValueField("IdEspecialidad")
 	                            .DataSource(dataBinding =>
-		                            dataBinding.Read("ConsultarEspecilidadesCita", "Procesos")))
+		                            dataBinding.Read("ConsultarEspecilidadesCita", "Procesos"))
+                                .AutoWidth(true)
+                                .HtmlAttributes(new { style = "width: 50%" }))
                             @Html.ValidationMessageFor(m => m.IdEspecialidad, "", new { @class = "text-danger" })
                         </td>
                     </tr>
@@ -223,11 +253,14 @@
                         <td>
                             @(Html.Kendo().DropDownListFor(model => model.IdMedico)
                                 .Name("dropDownMedico")
-                                .DataValueField("IdMedico")
+                                .DataValueField("IdPersona")
                                 .DataTextField("NombreMedico")
                                 .CascadeFrom("dropDownEspecialidad")
                                 .DataSource(db => db.Read(r => r.Action("ConsultarMedicosCita", "Procesos").Data("filtrarDatosConsultaMedicos"))
-                                .ServerFiltering(true)))
+                                .ServerFiltering(true))
+                                .Events(events => events.Change("onDataBindingDropDown"))
+                                .AutoWidth(true)
+                                .HtmlAttributes(new { style = "width: 50%" }))
                             @Html.ValidationMessageFor(m => m.IdMedico, "", new { @class = "text-danger" })
                         </td>
                     </tr>
@@ -251,7 +284,9 @@
                                 .DataTextField("Nombre")
                                 .CascadeFrom("dropDownMedico")
                                 .DataSource(db => db.Read(r => r.Action("ConsultarHorariosCita", "Procesos").Data("filtrarDatosConsultaHorarios"))
-                                .ServerFiltering(true)))
+                                .ServerFiltering(true))
+                                .Events(events => events.Change("onDataBindingDropDown"))
+                                .AutoWidth(true))
                             @Html.ValidationMessageFor(m => m.IdHoraCita, "", new { @class = "text-danger" })
                         </td>
                     </tr>
@@ -260,7 +295,7 @@
                             Motivo
                         </td>
                         <td>
-                            @Html.TextAreaFor(m => m.Motivo, new { style = "width:100%; height:80%", @class = "form-control" })
+                            @Html.TextAreaFor(m => m.Motivo, new { @class = "form-control", style = "width: 100%; height: 80%" })
                             @Html.ValidationMessageFor(m => m.Motivo, "", new { @class = "text-danger" })
                         </td>
                     </tr>
@@ -269,7 +304,7 @@
                 <table>
                     <tr>
                         <td>
-                            <input type="submit" id="agendar" value="Agendar Cita" class="btn btn-default" @(string.IsNullOrEmpty(Model.Identificacion) ? "" : "disabled") />
+                            <input type="submit" id="agendar" value="Agendar Cita" class="btn btn-default" @(string.IsNullOrEmpty(Model.Identificacion) ? "disabled" : "") />
                             <input type="submit" id="reagendar" value="Reagendar Cita" class="btn btn-default" disabled />
                             <input type="submit" id="cancelar" value="Cancelar Cita" class="btn btn-default" disabled />
                             <input type="submit" id="limpiar" value="Limpiar" class="btn btn-default" />
@@ -280,10 +315,16 @@
                 @Html.HiddenFor(m => m.IdCita)
                 @Html.HiddenFor(m => m.EsPaciente)
                 @Html.HiddenFor(m => m.FechaActual)
+                @Html.HiddenFor(m => m.IdEspecialidad)
+                @Html.HiddenFor(m => m.IdMedico)
+                @Html.HiddenFor(m => m.IdHoraCita)
+
+                <script type="text/javascript">
+                    $(document).ready(function () {
+                        $('#@identificacion').trigger("change");
+                    })
+                </script>
             }
-            <script type="text/javascript">
-                $('#@identificacion').trigger('change');
-            </script>
         </section>
     </div>
 </div>

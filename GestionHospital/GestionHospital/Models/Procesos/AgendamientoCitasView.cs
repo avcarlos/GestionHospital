@@ -24,7 +24,7 @@ namespace GestionHospital.Models.Procesos
         public int IdMedico { get; set; }
 
         [Required]
-        public DateTime FechaCita { get; set; }
+        public DateTime? FechaCita { get; set; }
 
         [Required]
         public int IdHoraCita { get; set; }

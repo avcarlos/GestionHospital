@@ -83,14 +83,18 @@ namespace GestionHospital.Logica
             return citas;
         }
 
-        public List<Horario> ConsultarHorariosDisponiblesCita(int idMedico, DateTime fecha)
+        public List<Horario> ConsultarHorariosDisponiblesCita(int idPaciente, int idMedico, DateTime fecha, int idCita)
         {
             AdministracionCore objAdministracion = new AdministracionCore();
 
             var horarios = objAdministracion.ConsultarHorarios(null, 102);
-            var citasAgendadas = ConsultarCitasMedicas(null, null, idMedico, 15, null, fecha, null);
+            var citasAgendadasMedico = ConsultarCitasMedicas(null, null, idMedico, 15, null, fecha, null);
 
-            horarios = horarios.FindAll(h => !citasAgendadas.Exists(c => c.IdHorario == h.IdHorario));
+            horarios = horarios.FindAll(h => !citasAgendadasMedico.Exists(c => c.IdHorario == h.IdHorario && c.IdCita != idCita));
+
+            var citasAgendadasPaciente = ConsultarCitasMedicas(null, idPaciente, null, 15, null, fecha, null);
+
+            horarios = horarios.FindAll(h => !citasAgendadasPaciente.Exists(c => c.IdHorario == h.IdHorario && c.IdCita != idCita));
 
             return horarios;
         }

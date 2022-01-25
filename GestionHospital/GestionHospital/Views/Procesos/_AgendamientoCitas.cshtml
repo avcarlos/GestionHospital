@@ -50,6 +50,7 @@
                             $('#@idHorario').val(0);
 
                             $('#dropDownEspecialidad').data('kendoDropDownList').dataSource.read();
+                            cargarGridCitas();
 
                             if (identificacionParam == "")
                                 return;
@@ -90,7 +91,6 @@
                 }
 
                 function onRowSelectedCita() {
-                    debugger;
 	                var selectedRow;
 	                var grid = this;
 
@@ -175,7 +175,7 @@
                 @Html.ValidationSummary(true, "", new { @class = "text-danger" })
                 <table style="width: 80%">
                     <tr>
-                        <td>
+                        <td style="width:20%">
                             Identificación:
                         </td>
                         <td>
@@ -294,8 +294,8 @@
                         <td>
                             Motivo
                         </td>
-                        <td>
-                            @Html.TextAreaFor(m => m.Motivo, new { @class = "form-control", style = "width: 100%; height: 80%" })
+                        <td colspan="2">
+                            @Html.TextAreaFor(m => m.Motivo, 3, 500, new { style = "width: 80%; max-width: 100%", @class = "form-control" })
                             @Html.ValidationMessageFor(m => m.Motivo, "", new { @class = "text-danger" })
                         </td>
                     </tr>

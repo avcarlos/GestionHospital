@@ -337,10 +337,163 @@ namespace GestionHospital.Controllers
         [AuthorizeUser(idOperacion: 111)]
         public ActionResult AgendaCitas()
         {
-            ViewBag.Title = "Visualización de citas por parte del médico";
-            ViewBag.Message = "En implementación.";
+            ViewBag.Title = "Gestión de citas";
 
-            return View("Index");
+            AdministracionCore objAdministracion = new AdministracionCore();
+
+            GestionCitasView vistaCitas = new GestionCitasView();
+
+            try
+            {
+                vistaCitas.FechaActual = DateTime.Now;
+                vistaCitas.FechaConsulta = vistaCitas.FechaActual;
+                vistaCitas.ListaEstados = objAdministracion.ConsultarDetallesCatalogo(4);
+
+                var usuario = (Usuario)System.Web.HttpContext.Current.Session["Usuario"];
+
+                if (usuario.IdRolSeguridad == 5)    // Medico
+                {
+                    vistaCitas.EsMedico = true;
+
+                    if (usuario.IdPersona.GetValueOrDefault() > 0)
+                    {
+                        var persona = objAdministracion.ConsultarPersonaId(usuario.IdPersona.GetValueOrDefault());
+                        var medico = objAdministracion.ConsultarMedico(persona.IdTipoIdentificacion, persona.Identificacion);
+
+                        if (medico != null && medico.EstadoTipo)
+                        {
+                            vistaCitas.IdMedico = medico.IdPersona;
+                            vistaCitas.IdentificacionMedico = medico.Identificacion;
+                            vistaCitas.NombreMedico = medico.Nombres + " " + medico.Apellidos;
+                        }
+                        else
+                            throw new Exception("Médico se encuentra inactivo.");
+                    }
+                    else
+                        throw new Exception("Usuario no asignado.");
+                }
+            }
+            catch (Exception ex)
+            {
+                ViewBag.MessageError = ex.Message;
+            }
+
+            return View("_GestionCitas", vistaCitas);
+        }
+
+        public JsonResult ConsultarMedicoCitas(string identificacion)
+        {
+            AdministracionCore objAdministracion = new AdministracionCore();
+
+            try
+            {
+                Medico medico = null;
+
+                var tiposIdentificaciones = objAdministracion.ConsultarDetallesCatalogo(3);
+
+                foreach (var item in tiposIdentificaciones)
+                {
+                    medico = objAdministracion.ConsultarMedico(item.IdDetalleCatalogo, identificacion);
+
+                    if (medico != null)
+                        break;
+                }
+
+                if (medico != null)
+                {
+                    var data = new
+                    {
+                        idMedico = medico.IdPersona,
+                        nombreMedico = medico.Nombres + " " + medico.Apellidos
+                    };
+
+                    return Json(data);
+                }
+
+                return Json("");
+            }
+            catch (Exception ex)
+            {
+                return RetornarErrorJsonResult(ex.Message);
+            }
+        }
+
+        public JsonResult CargarCitasPendientesMedico([DataSourceRequest]
+                                                    DataSourceRequest request, int idMedico, string fechaCitas)
+        {
+            ProcesosCore objProcesos = new ProcesosCore();
+
+            try
+            {
+                var fecha = Convert.ToDateTime(fechaCitas);
+
+                var citasPendientes = objProcesos.ConsultarCitasPendientesMedico(idMedico, fecha);
+
+                if (citasPendientes == null)
+                    citasPendientes = new List<CitaMedica>();
+                else
+                    citasPendientes = citasPendientes.OrderBy(c => c.Fecha).OrderBy(c => c.IdHorario).ToList();
+
+                return Json(citasPendientes.ToDataSourceResult(request));
+            }
+            catch (Exception ex)
+            {
+                return RetornarErrorJsonResult(ex.Message);
+            }
+        }
+
+        public ActionResult GuardarDatosCita(GestionCitasView vistaCitas)
+        {
+            ViewBag.Title = "Gestión de citas";
+            
+            AdministracionCore objAdministracion = new AdministracionCore();
+            ProcesosCore objProcesos = new ProcesosCore();
+
+            DateTime fechaActual = DateTime.Now;
+
+            List<DetalleCatalogo> listaEstados = new List<DetalleCatalogo>();
+
+            try
+            {
+                DateTime fechaConsulta = vistaCitas.FechaConsulta;
+                listaEstados = objAdministracion.ConsultarDetallesCatalogo(4);
+
+                if (ModelState.IsValid)
+                {
+                    string identificacion = vistaCitas.IdentificacionMedico;
+
+                    CitaMedica cita = new CitaMedica()
+                    {
+                        IdCita = vistaCitas.IdCita,
+                        Diagnostico = vistaCitas.Diagnostico,
+                        Examenes = vistaCitas.Examenes,
+                        Receta = vistaCitas.Receta,
+                        IdEstado = vistaCitas.IdEstadoCita,
+                        FechaProximoControl = vistaCitas.FechaProximoControl
+                    };
+
+                    objProcesos.GuardarDatosAdicionalesCita(cita);
+
+                    vistaCitas = new GestionCitasView
+                    {
+                        IdentificacionMedico = identificacion,
+                        FechaConsulta = fechaConsulta
+                    };
+
+                    ModelState.Clear();
+                }
+
+                ViewBag.Message = "Cita Guardad Correctamente";
+            }
+            catch (Exception ex)
+            {
+                ViewBag.MessageError = ex.Message;
+            }
+
+            vistaCitas.FechaActual = fechaActual;
+            vistaCitas.ListaEstados = listaEstados;
+
+            return View("_GestionCitas", vistaCitas);
         }
 
         #region Comunes

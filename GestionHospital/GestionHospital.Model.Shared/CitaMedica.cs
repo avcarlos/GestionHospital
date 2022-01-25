@@ -8,6 +8,10 @@ namespace GestionHospital.Model.Shared
 
         public int IdPaciente { get; set; }
 
+        public string NombrePaciente { get; set; }
+
+        public int EdadPaciente { get; set; }
+
         public int IdEspecialidadMedico { get; set; }
 
         public int IdEspecialidad { get; set; }
@@ -26,13 +30,15 @@ namespace GestionHospital.Model.Shared
 
         public string Motivo { get; set; }
 
+        public string Diagnostico { get; set; }
+
         public string Observaciones { get; set; }
 
         public string Examenes { get; set; }
 
         public string Receta { get; set; }
 
-        public DateTime FechaProximoControl { get; set; }
+        public DateTime? FechaProximoControl { get; set; }
 
         public int IdEstado { get; set; }
     }

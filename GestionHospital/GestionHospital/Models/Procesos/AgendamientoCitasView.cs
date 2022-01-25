@@ -1,6 +1,4 @@
-﻿using GestionHospital.Model.Shared;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace GestionHospital.Models.Procesos

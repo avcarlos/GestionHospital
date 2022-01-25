@@ -60,6 +60,16 @@ namespace GestionHospital.Logica
             cita.NombreMedico = medico.Nombres + " " + medico.Apellidos;
             cita.NombreHorario = objAdministracion.ConsultarHorario(cita.IdHorario).Nombre;
 
+            if (cita.IdPaciente > 0)
+            {
+                var paciente = objAdministracion.ConsultarPersonaId(cita.IdPaciente);
+
+                cita.NombrePaciente = paciente.Nombres + " " + paciente.Apellidos;
+
+                if (paciente.FechaNacimiento != null)
+                    cita.EdadPaciente = DateTime.Today.AddTicks(-paciente.FechaNacimiento.GetValueOrDefault().Ticks).Year - 1;
+            }
+
             return cita;
         }
 
@@ -78,6 +88,8 @@ namespace GestionHospital.Logica
                 cita.NombreEspecialidad = datosCita.NombreEspecialidad;
                 cita.NombreMedico = datosCita.NombreMedico;
                 cita.NombreHorario = datosCita.NombreHorario;
+                cita.NombrePaciente = datosCita.NombrePaciente;
+                cita.EdadPaciente = datosCita.EdadPaciente;
             }
 
             return citas;
@@ -117,6 +129,26 @@ namespace GestionHospital.Logica
             objData.Insert("GuardarCita", CommandType.StoredProcedure, parameters);
         }
 
+        public void GuardarDatosAdicionalesCita(CitaMedica cita)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[6]
+            {
+                objData.CreateParameter("@i_id_cita", SqlDbType.Int, 4, cita.IdCita),
+                objData.CreateParameter("@i_diagnostico", SqlDbType.VarChar, 300, cita.Diagnostico),
+                objData.CreateParameter("@i_examenes", SqlDbType.VarChar, 300, cita.Examenes),
+                objData.CreateParameter("@i_receta", SqlDbType.VarChar, 300, cita.Receta),
+                objData.CreateParameter("@i_id_estado", SqlDbType.Int, 4, cita.IdEstado),
+                objData.CreateParameter("@i_fecha_proximo_control", SqlDbType.DateTime, 8)
+            };
+
+            if (cita.FechaProximoControl != null)
+                parameters[5].Value = cita.FechaProximoControl.GetValueOrDefault();
+
+            objData.Insert("GuardarDatosAdicionalesCita", CommandType.StoredProcedure, parameters);
+        }
+
         public void ActualizarCita(CitaMedica cita)
         {
             if (cita != null)
@@ -148,6 +180,28 @@ namespace GestionHospital.Logica
             };
 
             objData.Delete("EliminarCita", CommandType.StoredProcedure, parameters);
+        }
+
+        #endregion
+
+        #region Gestión Citas
+
+        public List<CitaMedica> ConsultarCitasPendientesMedico(int idMedico, DateTime fecha)
+        {
+            var citas = ConsultarCitasMedicas(null, null, idMedico, 15, null, fecha, null);
+
+            foreach (var cita in citas)
+            {
+                var datosCita = ConsultarDatosCompletosCitas(cita);
+
+                cita.NombreEspecialidad = datosCita.NombreEspecialidad;
+                cita.NombreMedico = datosCita.NombreMedico;
+                cita.NombreHorario = datosCita.NombreHorario;
+                cita.NombrePaciente = datosCita.NombrePaciente;
+                cita.EdadPaciente = datosCita.EdadPaciente;
+            }
+
+            return citas;
         }
 
         #endregion

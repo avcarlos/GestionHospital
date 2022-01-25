@@ -6,6 +6,7 @@
 	[Fecha]					DATETIME			NOT NULL,
 	[IdHorario]				INT					NOT NULL,
 	[Motivo]				VARCHAR(300)		NULL,
+	[Diagnostico]			VARCHAR(300)		NULL,
 	[Observaciones]			VARCHAR(300)		NULL,
 	[Examenes]				VARCHAR(300)		NULL,
 	[Receta]				VARCHAR(300)		NULL,

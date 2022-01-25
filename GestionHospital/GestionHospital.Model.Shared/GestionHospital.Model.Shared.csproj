@@ -41,8 +41,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CitaMedica.cs" />
     <Compile Include="DetalleCatalogo.cs" />
     <Compile Include="Especialidad.cs" />
+    <Compile Include="Horario.cs" />
     <Compile Include="Medico.cs" />
     <Compile Include="Paciente.cs" />
     <Compile Include="Persona.cs" />

@@ -159,14 +159,14 @@ namespace GestionHospital.DataAccess
 
                     command.ExecuteNonQuery();
 
-                    foreach(var par in command.Parameters)
+                    foreach (var par in command.Parameters)
                     {
                         var datoSql = (SqlParameter)par;
 
                         if (datoSql.Direction == ParameterDirection.Output)
                         {
-                            if(datoSql.SqlDbType == SqlDbType.Int)
-                            idObject = (int)datoSql.Value;
+                            if (datoSql.SqlDbType == SqlDbType.Int)
+                                idObject = (int)datoSql.Value;
                         }
                     }
                 }

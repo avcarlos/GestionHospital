@@ -59,7 +59,7 @@ namespace GestionHospital.Logica
 
         #region Persona
 
-        public Persona ConsultarPersona(int idTipoIdentificacion, string identificacion, int? idTipoPersona = null)
+        public Persona ConsultarPersona(int? idTipoIdentificacion, string identificacion, int? idTipoPersona = null)
         {
             var objData = GetConnection();
 
@@ -456,6 +456,20 @@ namespace GestionHospital.Logica
             objData.Delete("EliminarEspecialidadMedico", CommandType.StoredProcedure, parameters);
         }
 
+        public List<Medico> ConsultarMedicosEspecialidad(int idEspecialidad)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[1]
+            {
+                objData.CreateParameter("@i_id_especialidad", SqlDbType.Int, 4, idEspecialidad)
+            };
+
+            var medicos = objData.ConsultarDatos<Medico>("ConsultarMedicosEspecialidad", parameters);
+
+            return medicos;
+        }
+
         #endregion
 
         #region Paciente
@@ -542,6 +556,61 @@ namespace GestionHospital.Logica
             var especialidades = objData.ConsultarDatos<Especialidad>("ConsultarEspecialidades");
 
             return especialidades;
+        }
+
+        public Especialidad ConsultarEspecialidad(int idEspecialidad)
+        {
+            var objData = GetConnection();
+
+            Especialidad especialidad = null;
+
+            IDbDataParameter[] parameters = new IDbDataParameter[1]
+            {
+                objData.CreateParameter("@i_id_especialidad", SqlDbType.Int, 4, idEspecialidad)
+            };
+
+            var especialidades = objData.ConsultarDatos<Especialidad>("ConsultarEspecialidades", parameters);
+
+            if (especialidades != null && especialidades.Count() > 0)
+                especialidad = especialidades.FirstOrDefault();
+
+            return especialidad;
+        }
+
+        #endregion
+
+        #region Horarios
+
+        public List<Horario> ConsultarHorarios(int? idHorario, int? idTipoHorario)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[2]
+            {
+                objData.CreateParameter("@i_id_horario", SqlDbType.Int, 4),
+                objData.CreateParameter("@i_id_tipo_horario", SqlDbType.Int, 4)
+            };
+
+            if (idHorario != null)
+                parameters[0].Value = idHorario.GetValueOrDefault();
+            if (idTipoHorario != null)
+                parameters[1].Value = idTipoHorario.GetValueOrDefault();
+
+            var horarios = objData.ConsultarDatos<Horario>("ConsultarHorarios", parameters);
+
+            return horarios;
+        }
+
+        public Horario ConsultarHorario(int idHorario)
+        {
+            Horario horario = null;
+
+            var horarios = ConsultarHorarios(idHorario, null);
+
+            if (horarios != null && horarios.Count() > 0)
+                horario = horarios.FirstOrDefault();
+
+            return horario;
         }
 
         #endregion

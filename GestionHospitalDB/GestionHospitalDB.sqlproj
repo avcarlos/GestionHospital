@@ -96,6 +96,12 @@
     <Build Include="dbo\Procedimientos Almacenados\RegistrarPersonaUsuario.sql" />
     <Build Include="dbo\Procedimientos Almacenados\ConsultarPersonaEmail.sql" />
     <Build Include="dbo\Procedimientos Almacenados\ConsultarUsuarioPersona.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarCitas.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarHorarios.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarMedicosEspecialidad.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\GuardarCita.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ActualizarCita.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\EliminarCita.sql" />
   </ItemGroup>
   <ItemGroup>
     <PreDeploy Include="Scripts\PreDeployment\Script.PreDeployment.sql" />

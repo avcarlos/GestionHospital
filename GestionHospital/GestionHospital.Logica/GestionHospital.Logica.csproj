@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AdministracionCore.cs" />
+    <Compile Include="ProcesosCore.cs" />
     <Compile Include="SeguridadCore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

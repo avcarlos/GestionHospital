@@ -97,6 +97,7 @@ IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 2) INSERT INTO dbo.
 IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 3) INSERT INTO dbo.Catalogo (IdCatalogo, Nombre, Estado) VALUES (3, 'Tipo Identificación', 1)
 IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 4) INSERT INTO dbo.Catalogo (IdCatalogo, Nombre, Estado) VALUES (4, 'Estado Cita', 1)
 IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 5) INSERT INTO dbo.Catalogo (IdCatalogo, Nombre, Estado) VALUES (5, 'Ciudad', 1)
+IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 6) INSERT INTO dbo.Catalogo (IdCatalogo, Nombre, Estado) VALUES (6, 'Tipo Horario', 1)
 
 SET IDENTITY_INSERT dbo.Catalogo OFF
 
@@ -122,6 +123,9 @@ IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 23) I
 IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 24) INSERT INTO dbo.DetalleCatalogo (IdDetalleCatalogo, IdCatalogo, Nombre, Codigo, Estado) VALUES (24, 5, 'Ambato', 'AMB', 1)
 IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 25) INSERT INTO dbo.DetalleCatalogo (IdDetalleCatalogo, IdCatalogo, Nombre, Codigo, Estado) VALUES (25, 5, 'Manta', 'MAN', 1)
 
+IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 101) INSERT INTO dbo.DetalleCatalogo (IdDetalleCatalogo, IdCatalogo, Nombre, Codigo, Estado) VALUES (101, 6, 'Medico', 'MED', 1)
+IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 102) INSERT INTO dbo.DetalleCatalogo (IdDetalleCatalogo, IdCatalogo, Nombre, Codigo, Estado) VALUES (102, 6, 'Cita', 'CIT', 1)
+
 SET IDENTITY_INSERT dbo.DetalleCatalogo OFF
 
 -- Especialidades
@@ -134,3 +138,24 @@ IF NOT EXISTS (SELECT 1 FROM dbo.Especialidad WHERE IdEspecialidad = 3) INSERT I
 IF NOT EXISTS (SELECT 1 FROM dbo.Especialidad WHERE IdEspecialidad = 4) INSERT INTO dbo.Especialidad (IdEspecialidad, Nombre, Estado, UsuarioRegistro, FechaRegistro) VALUES (4, 'Ginecología', 1, 1, '2022-01-01')
 
 SET IDENTITY_INSERT dbo.Especialidad OFF
+
+-- Horarios
+
+SET IDENTITY_INSERT dbo.Horario ON
+
+IF NOT EXISTS (SELECT 1 FROM dbo.Horario WHERE IdHorario = 1) INSERT INTO dbo.Horario (IdHorario, Nombre, HoraInicio, HoraFin, IdTipoHorario, Estado) VALUES (1, '9:00 - 12:00', '09:00:00', '12:00:00', 101, 1)
+IF NOT EXISTS (SELECT 1 FROM dbo.Horario WHERE IdHorario = 2) INSERT INTO dbo.Horario (IdHorario, Nombre, HoraInicio, HoraFin, IdTipoHorario, Estado) VALUES (2, '16:00 - 18:00', '16:00:00', '18:00:00', 101, 1)
+
+IF NOT EXISTS (SELECT 1 FROM dbo.Horario WHERE IdHorario = 3) INSERT INTO dbo.Horario (IdHorario, Nombre, HoraInicio, HoraFin, IdTipoHorario, Estado) VALUES (3, '9:00 - 9:30', '09:00:00', '09:30:00', 102, 1)
+IF NOT EXISTS (SELECT 1 FROM dbo.Horario WHERE IdHorario = 4) INSERT INTO dbo.Horario (IdHorario, Nombre, HoraInicio, HoraFin, IdTipoHorario, Estado) VALUES (4, '9:30 - 10:00', '09:30:00', '10:00:00', 102, 1)
+IF NOT EXISTS (SELECT 1 FROM dbo.Horario WHERE IdHorario = 5) INSERT INTO dbo.Horario (IdHorario, Nombre, HoraInicio, HoraFin, IdTipoHorario, Estado) VALUES (5, '10:00 - 10:30', '10:00:00', '10:30:00', 102, 1)
+IF NOT EXISTS (SELECT 1 FROM dbo.Horario WHERE IdHorario = 6) INSERT INTO dbo.Horario (IdHorario, Nombre, HoraInicio, HoraFin, IdTipoHorario, Estado) VALUES (6, '10:30 - 11:00', '10:30:00', '11:00:00', 102, 1)
+IF NOT EXISTS (SELECT 1 FROM dbo.Horario WHERE IdHorario = 7) INSERT INTO dbo.Horario (IdHorario, Nombre, HoraInicio, HoraFin, IdTipoHorario, Estado) VALUES (7, '11:00 - 11:30', '11:00:00', '11:30:00', 102, 1)
+IF NOT EXISTS (SELECT 1 FROM dbo.Horario WHERE IdHorario = 8) INSERT INTO dbo.Horario (IdHorario, Nombre, HoraInicio, HoraFin, IdTipoHorario, Estado) VALUES (8, '11:30 - 12:00', '11:30:00', '12:00:00', 102, 1)
+
+IF NOT EXISTS (SELECT 1 FROM dbo.Horario WHERE IdHorario = 9) INSERT INTO dbo.Horario (IdHorario, Nombre, HoraInicio, HoraFin, IdTipoHorario, Estado) VALUES (9, '16:00 - 16:30', '16:00:00', '16:30:00', 102, 1)
+IF NOT EXISTS (SELECT 1 FROM dbo.Horario WHERE IdHorario = 10) INSERT INTO dbo.Horario (IdHorario, Nombre, HoraInicio, HoraFin, IdTipoHorario, Estado) VALUES (10, '16:30 - 17:00', '16:30:00', '17:00:00', 102, 1)
+IF NOT EXISTS (SELECT 1 FROM dbo.Horario WHERE IdHorario = 11) INSERT INTO dbo.Horario (IdHorario, Nombre, HoraInicio, HoraFin, IdTipoHorario, Estado) VALUES (11, '17:00 - 17:30', '17:00:00', '17:30:00', 102, 1)
+IF NOT EXISTS (SELECT 1 FROM dbo.Horario WHERE IdHorario = 12) INSERT INTO dbo.Horario (IdHorario, Nombre, HoraInicio, HoraFin, IdTipoHorario, Estado) VALUES (12, '17:30 - 18:00', '17:30:00', '18:00:00', 102, 1)
+
+SET IDENTITY_INSERT dbo.Horario OFF

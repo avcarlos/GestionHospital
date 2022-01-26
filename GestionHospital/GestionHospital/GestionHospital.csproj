@@ -184,6 +184,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\Administracion\EspecialidadesView.cs" />
     <Compile Include="Models\Administracion\PacienteLineaView.cs" />
     <Compile Include="Models\Administracion\PacienteView.cs" />
     <Compile Include="Models\Administracion\PersonalMedicoView.cs" />
@@ -2784,6 +2785,7 @@
     <Content Include="Views\Shared\EditorTemplates\Url.cshtml" />
     <Content Include="Views\Procesos\_AgendamientoCitas.cshtml" />
     <Content Include="Views\Procesos\_GestionCitas.cshtml" />
+    <Content Include="Views\Administracion\_Especialidades.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

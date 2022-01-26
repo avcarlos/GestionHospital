@@ -22,10 +22,10 @@ SET IDENTITY_INSERT dbo.Transaccion ON
 IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion =   1) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (  1, 'Personal Médico', 1, 'Administracion\PersonalMedico')
 IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion =  11) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES ( 11, 'Especialidades', 1, 'Administracion\Especialidades')
 IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion =  21) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES ( 21, 'Pacientes', 1, 'Administracion\Paciente')
-IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion =  31) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES ( 31, 'Registro en Línea', 1, 'Administracion\PacienteLinea')
-IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion = 101) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (101, 'Citas', 1, 'Procesos\AgendamientoCita')
-IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion = 111) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (111, 'Visualización Citas', 1, 'Procesos\AgendaCitas')
-IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion = 201) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (201, 'Estadísticas Salud', 1, 'Consultas\Estadistica')
+IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion =  31) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES ( 31, 'Perfil Paciente', 1, 'Administracion\PacienteLinea')
+IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion = 101) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (101, 'Agenda Citas', 1, 'Procesos\AgendamientoCita')
+IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion = 111) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (111, 'Gestión Citas', 1, 'Procesos\AgendaCitas')
+IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion = 201) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (201, 'Estadísticas', 1, 'Consultas\Estadistica')
 IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion = 901) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (901, 'Roles', 1, 'Seguridad\Roles')
 IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion = 911) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (911, 'Permisos', 1, 'Seguridad\Permisos')
 IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion = 921) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (921, 'Usuarios', 1, 'Seguridad\Usuarios')
@@ -132,10 +132,10 @@ SET IDENTITY_INSERT dbo.DetalleCatalogo OFF
 
 SET IDENTITY_INSERT dbo.Especialidad ON
 
-IF NOT EXISTS (SELECT 1 FROM dbo.Especialidad WHERE IdEspecialidad = 1) INSERT INTO dbo.Especialidad (IdEspecialidad, Nombre, Estado, UsuarioRegistro, FechaRegistro) VALUES (1, 'Medicina Interna', 1, 1, '2022-01-01')
-IF NOT EXISTS (SELECT 1 FROM dbo.Especialidad WHERE IdEspecialidad = 2) INSERT INTO dbo.Especialidad (IdEspecialidad, Nombre, Estado, UsuarioRegistro, FechaRegistro) VALUES (2, 'Pediatría', 1, 1, '2022-01-01')
-IF NOT EXISTS (SELECT 1 FROM dbo.Especialidad WHERE IdEspecialidad = 3) INSERT INTO dbo.Especialidad (IdEspecialidad, Nombre, Estado, UsuarioRegistro, FechaRegistro) VALUES (3, 'Endocrinología', 1, 1, '2022-01-01')
-IF NOT EXISTS (SELECT 1 FROM dbo.Especialidad WHERE IdEspecialidad = 4) INSERT INTO dbo.Especialidad (IdEspecialidad, Nombre, Estado, UsuarioRegistro, FechaRegistro) VALUES (4, 'Ginecología', 1, 1, '2022-01-01')
+IF NOT EXISTS (SELECT 1 FROM dbo.Especialidad WHERE IdEspecialidad = 1) INSERT INTO dbo.Especialidad (IdEspecialidad, Nombre, Estado, IdUsuarioRegistro, FechaRegistro) VALUES (1, 'Medicina Interna', 1, 1, '2022-01-01')
+IF NOT EXISTS (SELECT 1 FROM dbo.Especialidad WHERE IdEspecialidad = 2) INSERT INTO dbo.Especialidad (IdEspecialidad, Nombre, Estado, IdUsuarioRegistro, FechaRegistro) VALUES (2, 'Pediatría', 1, 1, '2022-01-01')
+IF NOT EXISTS (SELECT 1 FROM dbo.Especialidad WHERE IdEspecialidad = 3) INSERT INTO dbo.Especialidad (IdEspecialidad, Nombre, Estado, IdUsuarioRegistro, FechaRegistro) VALUES (3, 'Endocrinología', 1, 1, '2022-01-01')
+IF NOT EXISTS (SELECT 1 FROM dbo.Especialidad WHERE IdEspecialidad = 4) INSERT INTO dbo.Especialidad (IdEspecialidad, Nombre, Estado, IdUsuarioRegistro, FechaRegistro) VALUES (4, 'Ginecología', 1, 1, '2022-01-01')
 
 SET IDENTITY_INSERT dbo.Especialidad OFF
 

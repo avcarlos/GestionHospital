@@ -360,9 +360,168 @@ namespace GestionHospital.Controllers
         public ActionResult Especialidades()
         {
             ViewBag.Title = "Gestión de especialidades";
-            ViewBag.Message = "En implementación.";
 
-            return View("Index");
+            EspecialidadesView vistaEspecialidades = new EspecialidadesView();
+
+            return View("_Especialidades", vistaEspecialidades);
+        }
+
+        public JsonResult CargarGridEspecialidades([DataSourceRequest] DataSourceRequest request)
+        {
+            AdministracionCore objAdministracion = new AdministracionCore();
+            SeguridadCore objSeguridad = new SeguridadCore();
+
+            try
+            {
+                var especialidades = objAdministracion.ConsultarEspecialidades(true);
+
+                if (especialidades == null)
+                    especialidades = new List<Especialidad>();
+                else
+                {
+                    var usuarios = objSeguridad.ConsultarUsuarios();
+
+                    foreach (var item in especialidades)
+                    {
+                        if (item.IdUsuarioRegistro != 0)
+                            item.NombreUsuarioRegistro = usuarios.FirstOrDefault(u => u.IdUsuario == item.IdUsuarioRegistro).LoginUsuario;
+
+                        if (item.IdUsuarioModificacion != 0)
+                            item.NombreUsuarioModificacion = usuarios.FirstOrDefault(u => u.IdUsuario == item.IdUsuarioModificacion).LoginUsuario;
+                    }
+
+                    especialidades = especialidades.OrderBy(e => e.IdEspecialidad).ToList();
+                }
+
+                return Json(especialidades.ToDataSourceResult(request));
+            }
+            catch (Exception ex)
+            {
+                return RetornarErrorJsonResult(ex.Message);
+            }
+        }
+
+        public ActionResult GuardarEspecialidad(EspecialidadesView vistaEspecialidad)
+        {
+            ViewBag.Title = "Gestión de especialidades";
+
+            AdministracionCore objAdministracion = new AdministracionCore();
+
+            try
+            {
+                var usuario = (Usuario)System.Web.HttpContext.Current.Session["Usuario"];
+
+                if (ModelState.IsValid)
+                {
+                    var especialidades = objAdministracion.ConsultarEspecialidades(true);
+
+                    if (especialidades.Exists(e => e.Nombre == vistaEspecialidad.NombreEspecialidad))
+                        throw new Exception("Ya existe una especilidad con ese nombre.");
+
+                    Especialidad especialidad = new Especialidad()
+                    {
+                        Nombre = vistaEspecialidad.NombreEspecialidad,
+                        Descripcion = vistaEspecialidad.Descripcion,
+                        IdUsuarioRegistro = usuario.IdUsuario
+                    };
+
+                    objAdministracion.GuardarEspecialidad(especialidad);
+
+                    vistaEspecialidad = new EspecialidadesView();
+
+                    ModelState.Clear();
+                }
+
+                ViewBag.Message = "Especialidad Guardada Correctamente";
+            }
+            catch (Exception ex)
+            {
+                ViewBag.MessageError = ex.Message;
+            }
+
+            return View("_Especialidades", vistaEspecialidad);
+        }
+
+        public ActionResult ActualizarEspecialidad(EspecialidadesView vistaEspecialidad)
+        {
+            ViewBag.Title = "Gestión de especialidades";
+
+            AdministracionCore objAdministracion = new AdministracionCore();
+
+            try
+            {
+                var usuario = (Usuario)System.Web.HttpContext.Current.Session["Usuario"];
+
+                if (ModelState.IsValid)
+                {
+                    var especialidades = objAdministracion.ConsultarEspecialidades(true);
+
+                    if (especialidades.Exists(e => e.Nombre == vistaEspecialidad.NombreEspecialidad && e.IdEspecialidad != vistaEspecialidad.IdEspecialidad))
+                        throw new Exception("Ya existe una especilidad con ese nombre.");
+
+                    Especialidad especialidad = new Especialidad()
+                    {
+                        IdEspecialidad = vistaEspecialidad.IdEspecialidad,
+                        Nombre = vistaEspecialidad.NombreEspecialidad,
+                        Descripcion = vistaEspecialidad.Descripcion,
+                        IdUsuarioModificacion = usuario.IdUsuario
+                    };
+
+                    objAdministracion.ActualizarEspecialidad(especialidad);
+
+                    vistaEspecialidad = new EspecialidadesView();
+
+                    ModelState.Clear();
+                }
+
+                ViewBag.Message = "Especialidad Acutalizada Correctamente";
+            }
+            catch (Exception ex)
+            {
+                ViewBag.MessageError = ex.Message;
+            }
+
+            return View("_Especialidades", vistaEspecialidad);
+        }
+
+        public ActionResult EliminarEspecialidad(EspecialidadesView vistaEspecialidad)
+        {
+            ViewBag.Title = "Gestión de especialidades";
+
+            AdministracionCore objAdministracion = new AdministracionCore();
+
+            try
+            {
+                var usuario = (Usuario)System.Web.HttpContext.Current.Session["Usuario"];
+
+                if (ModelState.IsValid)
+                {
+                    var medicosEspecialidad = objAdministracion.ConsultarMedicosEspecialidad(vistaEspecialidad.IdEspecialidad);
+
+                    if (medicosEspecialidad != null && medicosEspecialidad.Count() > 0)
+                        throw new Exception("Especialidad no puede ser eliminada por tener médicos asignados");
+
+                    Especialidad especialidad = new Especialidad()
+                    {
+                        IdEspecialidad = vistaEspecialidad.IdEspecialidad,
+                        IdUsuarioModificacion = usuario.IdUsuario
+                    };
+
+                    objAdministracion.EliminarEspecialidad(especialidad);
+
+                    vistaEspecialidad = new EspecialidadesView();
+
+                    ModelState.Clear();
+                }
+
+                ViewBag.Message = "Especialidad Eliminada Correctamente";
+            }
+            catch (Exception ex)
+            {
+                ViewBag.MessageError = ex.Message;
+            }
+
+            return View("_Especialidades", vistaEspecialidad);
         }
 
         #endregion

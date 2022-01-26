@@ -4,11 +4,11 @@
 	[Nombre]				VARCHAR(30)			NOT NULL,
 	[Descripcion]			VARCHAR(300)		NULL,
 	[Estado]				BIT					NULL,
-	[UsuarioRegistro]		INT					NULL,
+	[IdUsuarioRegistro]		INT					NULL,
 	[FechaRegistro]			DATETIME			NULL,
-	[UsuarioModificacion]	INT					NULL,
+	[IdUsuarioModificacion]	INT					NULL,
 	[FechaModificacion]		DATETIME			NULL,
 	CONSTRAINT [PK_Especialidad] PRIMARY KEY (IdEspecialidad),
-	CONSTRAINT [FK_UsuarioRegistro_Especialidad] FOREIGN KEY (UsuarioRegistro) REFERENCES Usuario(IdUsuario),
-	CONSTRAINT [FK_UsuarioModificacion_Especialidad] FOREIGN KEY (UsuarioModificacion) REFERENCES Usuario(IdUsuario)
+	CONSTRAINT [FK_UsuarioRegistro_Especialidad] FOREIGN KEY (IdUsuarioRegistro) REFERENCES Usuario(IdUsuario),
+	CONSTRAINT [FK_UsuarioModificacion_Especialidad] FOREIGN KEY (IdUsuarioModificacion) REFERENCES Usuario(IdUsuario)
 )

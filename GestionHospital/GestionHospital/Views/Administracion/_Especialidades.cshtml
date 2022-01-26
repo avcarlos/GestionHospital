@@ -1,0 +1,184 @@
+﻿@using GestionHospital.Models.Administracion
+@model EspecialidadesView
+@{
+    IEnumerable<SelectListItem> estadosEspecialidades = new List<SelectListItem>
+    {
+        new SelectListItem{ Value = "1", Text = "Activo" },
+        new SelectListItem{ Value = "0", Text = "Inactivo" }
+    };
+}
+<h2>@ViewBag.Title.</h2>
+<h4 id="mensajeError" class="text-danger" style="display:@(string.IsNullOrEmpty(ViewBag.MessageError) ? "none" : string.Empty)">@ViewBag.MessageError.</h4>
+<h4 id="mensajeExito" class="text-info" style="display:@(string.IsNullOrEmpty(ViewBag.Message) ? "none" : string.Empty)">@ViewBag.Message.</h4>
+<div class="row">
+    <div class="col-md-11">
+        <section id="especialidadesForm">
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $('#guardar').click(function () {
+                        $('form').attr('Action', '/Administracion/GuardarEspecialidad');
+                    });
+
+                    $('#guardar').click(function () {
+                        $('form').attr('Action', '/Administracion/ActualizarEspecialidad');
+                    });
+
+                    $('#eliminar').click(function () {
+                        $('form').attr('Action', '/Administracion/EliminarEspecialidad');
+                    });
+
+                    $('#limpiar').click(function () {
+                        $('form').attr('Action', '/Administracion/Especialidades');
+                    });
+                })
+
+                function onRowSelectedEspecialidad() {
+                    var selectedRow;
+                    var grid = this;
+
+                    grid.select().each(function () {
+                        selectedRow = grid.dataItem($(this));
+                    });
+
+                    $('#cancelar').show();
+                    document.getElementById('eliminar').disabled = 'disabled';
+                    document.getElementById('guardar').disabled = 'disabled';
+                    document.getElementById('actualizar').disabled = '';
+
+                    $('#Estado').data('kendoComboBox').enable(false);
+
+                    $('#IdEspecialidad').val(selectedRow.IdEspecialidad);
+                    $('#NombreEspecialidad').val(selectedRow.Nombre);
+                    $('#Descripcion').val(selectedRow.Descripcion);
+                    $('#UsuarioRegistro').val(selectedRow.NombreUsuarioRegistro);
+                    $('#FechaRegistro').data('kendoDatePicker').value(selectedRow.FechaRegistro);
+                    $('#UsuarioModificacion').val(selectedRow.NombreUsuarioModificacion);
+                    $('#FechaModificacion').data('kendoDatePicker').value(selectedRow.FechaModificacion);
+                    $('#Estado').data('kendoComboBox').value(selectedRow.Estado ? "1" : "0");
+
+                    if (!selectedRow.Estado) {
+                        $('#Estado').data('kendoComboBox').enable(true);
+                    } else {
+                        document.getElementById('eliminar').disabled = '';
+                    }
+                }
+
+                function cancelarEdicionEspecialidad() {
+                    $('#cancelar').hide();
+                    document.getElementById('guardar').disabled = '';
+                    document.getElementById('actualizar').disabled = 'disabled';
+                    document.getElementById('eliminar').disabled = 'disabled';
+
+                    $('#Estado').data('kendoComboBox').enable(false);
+
+                    $('#IdEspecialidad').val(0);
+                    $('#NombreEspecialidad').val('');
+                    $('#Descripcion').val('');
+                    $('#UsuarioRegistro').val('');
+                    $('#FechaRegistro').data('kendoDatePicker').value(0);
+                    $('#UsuarioModificacion').val('');
+                    $('#FechaModificacion').data('kendoDatePicker').value(0);
+                    $('#Estado').data('kendoComboBox').value("0");
+                }
+            </script>
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <table style="width: 80%">
+                    <tr>
+                        <td colspan="3">
+                            @(
+                                Html.Kendo()
+                                .Grid<GestionHospital.Model.Shared.Especialidad>()
+                                .Name("GridEspecialidades")
+                                .Columns(c =>
+                                {
+                                    c.Bound(col => col.IdEspecialidad).Hidden();
+                                    c.Bound(col => col.Nombre).Title("Especialidad");
+                                    c.Bound(col => col.Descripcion).Title("Descripcion");
+                                    c.Bound(col => col.Estado).Title("Estado").ClientTemplate("#: Estado ? 'Activo' : 'Inactivo' #");
+                                })
+                                .Selectable()
+                                .DataSource(dataBinding => dataBinding.Ajax()
+                                    .Read("CargarGridEspecialidades", "Administracion"))
+                                .Events(events => events.Change("onRowSelectedEspecialidad") )
+                            )
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%">
+                            Nombre:
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.NombreEspecialidad, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.NombreEspecialidad, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Descripción:
+                        </td>
+                        <td>
+                            @Html.TextAreaFor(m => m.Descripcion, new { style = "width:100%; height:80%", @class = "form-control" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Usuario Registro:
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.UsuarioRegistro, new { @readonly = "readonly", @class = "form-control" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Fecha Registro:
+                        </td>
+                        <td>
+                            @Html.Kendo().DatePickerFor(model => model.FechaRegistro).Enable(false)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Usuario Modificación:
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.UsuarioModificacion, new { @readonly = "readonly", @class = "form-control" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Fecha Modificación:
+                        </td>
+                        <td>
+                            @Html.Kendo().DatePickerFor(model => model.FechaModificacion).Enable(false)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Estado:
+                        </td>
+                        <td>
+                            @Html.Kendo().ComboBoxFor(model => model.Estado).BindTo(new SelectList(estadosEspecialidades, "Value", "Text")).Enable(false)
+                        </td>
+                    </tr>
+                </table>
+                <hr />
+                <table>
+                    <tr>
+                        <td>
+                            <input type="submit" id="guardar" value="Guardar" class="btn btn-default" />
+                            <input type="submit" id="actualizar" value="Actualizar" class="btn btn-default" disabled />
+                            <input type="submit" id="eliminar" value="Eliminar" class="btn btn-default" disabled />
+                            <input type="submit" id="cancelar" value="Cancelar" class="btn btn-default" onclick="cancelarEdicionEspecialidad()" style="display:none" />
+                            <input type="submit" id="limpiar" value="Limpiar" class="btn btn-default" />
+                        </td>
+                    </tr>
+                </table>
+                @Html.HiddenFor(m => m.IdEspecialidad)
+            }
+        </section>
+    </div>
+</div>

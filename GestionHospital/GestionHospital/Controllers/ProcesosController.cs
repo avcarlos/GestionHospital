@@ -135,7 +135,7 @@ namespace GestionHospital.Controllers
                 if (especialidades == null)
                     especialidades = new List<Especialidad>();
                 else
-                    especialidades = especialidades.FindAll(e => e.Estado).OrderBy(e => e.IdEspecialidad).ToList();
+                    especialidades = especialidades.OrderBy(e => e.IdEspecialidad).ToList();
 
                 return Json(especialidades, JsonRequestBehavior.AllowGet);
             }
@@ -496,6 +496,8 @@ namespace GestionHospital.Controllers
             return View("_GestionCitas", vistaCitas);
         }
 
+        #endregion
+
         #region Comunes
 
         private JsonResult RetornarErrorJsonResult(string mensajeError)
@@ -505,8 +507,6 @@ namespace GestionHospital.Controllers
 
             return Json(mensajeError, JsonRequestBehavior.AllowGet);
         }
-
-        #endregion
 
         #endregion
     }

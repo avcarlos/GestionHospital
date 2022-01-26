@@ -549,11 +549,14 @@ namespace GestionHospital.Logica
 
         #region Especialidades
 
-        public List<Especialidad> ConsultarEspecialidades()
+        public List<Especialidad> ConsultarEspecialidades(bool incluirInactivas = false)
         {
             var objData = GetConnection();
 
             var especialidades = objData.ConsultarDatos<Especialidad>("ConsultarEspecialidades");
+
+            if(!incluirInactivas)
+                especialidades = especialidades.FindAll(e => e.Estado);
 
             return especialidades;
         }
@@ -575,6 +578,51 @@ namespace GestionHospital.Logica
                 especialidad = especialidades.FirstOrDefault();
 
             return especialidad;
+        }
+
+        public void GuardarEspecialidad(Especialidad especilidad)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[3]
+            {
+                objData.CreateParameter("@i_nombre", SqlDbType.VarChar, 30, especilidad.Nombre),
+                objData.CreateParameter("@i_descripcion", SqlDbType.VarChar, 300, especilidad.Descripcion),
+                objData.CreateParameter("@i_id_usuario_registro", SqlDbType.Int, 4, especilidad.IdUsuarioRegistro)
+            };
+
+            objData.Insert("GuardarEspecialidad", CommandType.StoredProcedure, parameters);
+        }
+
+        public void ActualizarEspecialidad(Especialidad especialidad)
+        {
+            if (especialidad != null)
+            {
+                var objData = GetConnection();
+
+                IDbDataParameter[] parameters = new IDbDataParameter[4]
+                {
+                    objData.CreateParameter("@i_id_especialidad", SqlDbType.Int, 4, especialidad.IdEspecialidad),
+                    objData.CreateParameter("@i_nombre", SqlDbType.VarChar, 30, especialidad.Nombre),
+                    objData.CreateParameter("@i_descripcion", SqlDbType.VarChar, 300, especialidad.Descripcion),
+                    objData.CreateParameter("@i_id_usuario_modificacion", SqlDbType.Int, 4, especialidad.IdUsuarioModificacion)
+                };
+
+                objData.Update("ActualizarEspecialidad", CommandType.StoredProcedure, parameters);
+            }
+        }
+
+        public void EliminarEspecialidad(Especialidad especialidad)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[2]
+            {
+                objData.CreateParameter("@i_id_especialidad", SqlDbType.Int, 4, especialidad.IdEspecialidad),
+                objData.CreateParameter("@i_id_usuario_modificacion", SqlDbType.Int, 4, especialidad.IdUsuarioModificacion)
+            };
+
+            objData.Delete("EliminarEspecialidad", CommandType.StoredProcedure, parameters);
         }
 
         #endregion

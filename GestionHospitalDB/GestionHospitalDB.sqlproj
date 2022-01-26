@@ -103,6 +103,9 @@
     <Build Include="dbo\Procedimientos Almacenados\ActualizarCita.sql" />
     <Build Include="dbo\Procedimientos Almacenados\EliminarCita.sql" />
     <Build Include="dbo\Procedimientos Almacenados\GuardarDatosAdicionalesCita.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\GuardarEspecialidad.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ActualizarEspecialidad.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\EliminarEspecialidad.sql" />
   </ItemGroup>
   <ItemGroup>
     <PreDeploy Include="Scripts\PreDeployment\Script.PreDeployment.sql" />

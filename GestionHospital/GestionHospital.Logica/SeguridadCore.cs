@@ -137,5 +137,52 @@ namespace GestionHospital.Logica
         }
 
         #endregion
+
+        #region Transaccion
+
+        public List<Transaccion> ConsultarTransacciones(bool incluirInactivas = false)
+        {
+            var objData = GetConnection();
+
+            var transacciones = objData.ConsultarDatos<Transaccion>("ConsultarTransacciones");
+
+            if (!incluirInactivas)
+                transacciones = transacciones.FindAll(t => t.Estado);
+
+            return transacciones;
+        }
+
+        public void ActualizarTransaccion(Transaccion transaccion, Usuario usuario)
+        {
+            if (transaccion != null)
+            {
+                var objData = GetConnection();
+
+                IDbDataParameter[] parameters = new IDbDataParameter[4]
+                {
+                    objData.CreateParameter("@i_id_transaccion", SqlDbType.Int, 4, transaccion.IdTransaccion),
+                    objData.CreateParameter("@i_descripcion", SqlDbType.VarChar, 300, transaccion.Descripcion),
+                    objData.CreateParameter("@i_estado", SqlDbType.Bit, 1, transaccion.Estado),
+                    objData.CreateParameter("@i_id_usuario_modificacion", SqlDbType.Int, 4, usuario.IdUsuario)
+                };
+
+                objData.Update("ActualizarTransaccion", CommandType.StoredProcedure, parameters);
+            }
+        }
+
+        public void EliminarTransaccion(Transaccion transaccion, Usuario usuario)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[2]
+            {
+                objData.CreateParameter("@i_id_transaccion", SqlDbType.Int, 4, transaccion.IdTransaccion),
+                objData.CreateParameter("@i_id_usuario_modificacion", SqlDbType.Int, 4, usuario.IdUsuario)
+            };
+
+            objData.Delete("EliminarTransaccion", CommandType.StoredProcedure, parameters);
+        }
+
+        #endregion
     }
 }

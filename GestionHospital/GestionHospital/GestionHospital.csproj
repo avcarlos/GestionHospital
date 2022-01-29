@@ -192,6 +192,7 @@
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\Procesos\GestionCitasView.cs" />
     <Compile Include="Models\Procesos\AgendamientoCitasView.cs" />
+    <Compile Include="Models\Seguridad\PermisosView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -2786,6 +2787,7 @@
     <Content Include="Views\Procesos\_AgendamientoCitas.cshtml" />
     <Content Include="Views\Procesos\_GestionCitas.cshtml" />
     <Content Include="Views\Administracion\_Especialidades.cshtml" />
+    <Content Include="Views\Seguridad\_Permisos.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

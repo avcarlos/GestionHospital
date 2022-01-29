@@ -19,7 +19,7 @@
                         $('form').attr('Action', '/Administracion/GuardarEspecialidad');
                     });
 
-                    $('#guardar').click(function () {
+                    $('#actualizar').click(function () {
                         $('form').attr('Action', '/Administracion/ActualizarEspecialidad');
                     });
 
@@ -55,6 +55,7 @@
                     $('#UsuarioModificacion').val(selectedRow.NombreUsuarioModificacion);
                     $('#FechaModificacion').data('kendoDatePicker').value(selectedRow.FechaModificacion);
                     $('#Estado').data('kendoComboBox').value(selectedRow.Estado ? "1" : "0");
+                    $('#EstadoOriginalEspecialidad').val(selectedRow.Estado);
 
                     if (!selectedRow.Estado) {
                         $('#Estado').data('kendoComboBox').enable(true);
@@ -79,6 +80,7 @@
                     $('#UsuarioModificacion').val('');
                     $('#FechaModificacion').data('kendoDatePicker').value(0);
                     $('#Estado').data('kendoComboBox').value("0");
+                    $('#EstadoOriginalEspecialidad').val('');
                 }
             </script>
             @using (Html.BeginForm())
@@ -172,12 +174,13 @@
                             <input type="submit" id="guardar" value="Guardar" class="btn btn-default" />
                             <input type="submit" id="actualizar" value="Actualizar" class="btn btn-default" disabled />
                             <input type="submit" id="eliminar" value="Eliminar" class="btn btn-default" disabled />
-                            <input type="submit" id="cancelar" value="Cancelar" class="btn btn-default" onclick="cancelarEdicionEspecialidad()" style="display:none" />
+                            <input type="button" id="cancelar" value="Cancelar" class="btn btn-default" onclick="cancelarEdicionEspecialidad()" style="display:none" />
                             <input type="submit" id="limpiar" value="Limpiar" class="btn btn-default" />
                         </td>
                     </tr>
                 </table>
                 @Html.HiddenFor(m => m.IdEspecialidad)
+                @Html.HiddenFor(m => m.EstadoOriginalEspecialidad)
             }
         </section>
     </div>

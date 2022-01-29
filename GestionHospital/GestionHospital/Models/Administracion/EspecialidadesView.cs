@@ -22,5 +22,7 @@ namespace GestionHospital.Models.Administracion
 
         [Required]
         public int Estado { get; set; }
+
+        public bool EstadoOriginalEspecialidad { get; set; }
     }
 }

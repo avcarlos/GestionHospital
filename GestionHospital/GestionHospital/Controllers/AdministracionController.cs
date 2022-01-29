@@ -464,6 +464,7 @@ namespace GestionHospital.Controllers
                         IdEspecialidad = vistaEspecialidad.IdEspecialidad,
                         Nombre = vistaEspecialidad.NombreEspecialidad,
                         Descripcion = vistaEspecialidad.Descripcion,
+                        Estado = vistaEspecialidad.EstadoOriginalEspecialidad ? true : vistaEspecialidad.Estado == 1,
                         IdUsuarioModificacion = usuario.IdUsuario
                     };
 
@@ -474,7 +475,7 @@ namespace GestionHospital.Controllers
                     ModelState.Clear();
                 }
 
-                ViewBag.Message = "Especialidad Acutalizada Correctamente";
+                ViewBag.Message = "Especialidad Actualizada Correctamente";
             }
             catch (Exception ex)
             {

@@ -106,6 +106,9 @@
     <Build Include="dbo\Procedimientos Almacenados\GuardarEspecialidad.sql" />
     <Build Include="dbo\Procedimientos Almacenados\ActualizarEspecialidad.sql" />
     <Build Include="dbo\Procedimientos Almacenados\EliminarEspecialidad.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarTransacciones.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ActualizarTransaccion.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\EliminarTransaccion.sql" />
   </ItemGroup>
   <ItemGroup>
     <PreDeploy Include="Scripts\PreDeployment\Script.PreDeployment.sql" />

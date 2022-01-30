@@ -7,6 +7,10 @@
 	[Estado]				BIT					NULL,
 	[Parametro1]			INT					NULL,
 	[Parametro2]			VARCHAR(300)		NULL,
+	[IdUsuarioCreacion]		INT					NULL,
+	[FechaCreacion]			DATETIME			NULL,
+	[IdUsuarioModificacion]	INT					NULL,
+	[FechaModificacion]		DATETIME			NULL,
 	CONSTRAINT [PK_DetalleCatalogo] PRIMARY KEY (IdDetalleCatalogo),
 	CONSTRAINT [FK_Catalogo_DetalleCatalogo] FOREIGN KEY (IdCatalogo) REFERENCES Catalogo(IdCatalogo)
 )

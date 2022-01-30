@@ -21,6 +21,7 @@ SET IDENTITY_INSERT dbo.Transaccion ON
 
 IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion =   1) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (  1, 'Personal Médico', 1, 'Administracion\PersonalMedico')
 IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion =  11) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES ( 11, 'Especialidades', 1, 'Administracion\Especialidades')
+IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion =  12) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES ( 12, 'Catálogos', 1, 'Administracion\Catalogos')
 IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion =  21) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES ( 21, 'Pacientes', 1, 'Administracion\Paciente')
 IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion =  31) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES ( 31, 'Perfil Paciente', 1, 'Administracion\PacienteLinea')
 IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion = 101) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (101, 'Agenda Citas', 1, 'Procesos\AgendamientoCita')
@@ -50,34 +51,36 @@ SET IDENTITY_INSERT dbo.TransaccionRolSeguridad ON
 
 IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 1 AND IdTransaccion =   1) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES ( 1, 1,   1)
 IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 1 AND IdTransaccion =  11) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES ( 2, 1,  11)
-IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 1 AND IdTransaccion =  21) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES ( 3, 1,  21)
-IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 1 AND IdTransaccion =  31) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES ( 4, 1,  31)
-IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 1 AND IdTransaccion = 101) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES ( 5, 1, 101)
-IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 1 AND IdTransaccion = 111) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES ( 6, 1, 111)
-IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 1 AND IdTransaccion = 201) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES ( 7, 1, 201)
-IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 1 AND IdTransaccion = 901) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES ( 8, 1, 901)
-IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 1 AND IdTransaccion = 911) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES ( 9, 1, 911)
-IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 1 AND IdTransaccion = 921) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (10, 1, 921)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 1 AND IdTransaccion =  12) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES ( 3, 1,  12)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 1 AND IdTransaccion =  21) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES ( 4, 1,  21)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 1 AND IdTransaccion =  31) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES ( 5, 1,  31)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 1 AND IdTransaccion = 101) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES ( 6, 1, 101)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 1 AND IdTransaccion = 111) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES ( 7, 1, 111)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 1 AND IdTransaccion = 201) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES ( 8, 1, 201)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 1 AND IdTransaccion = 901) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES ( 9, 1, 901)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 1 AND IdTransaccion = 911) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (10, 1, 911)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 1 AND IdTransaccion = 921) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (11, 1, 921)
 
-IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 2 AND IdTransaccion =  31) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (11, 2,  31)
-IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 2 AND IdTransaccion = 101) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (12, 2, 101)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 2 AND IdTransaccion =  31) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (12, 2,  31)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 2 AND IdTransaccion = 101) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (13, 2, 101)
 
-IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 3 AND IdTransaccion = 101) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (13, 3, 101)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 3 AND IdTransaccion = 101) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (14, 3, 101)
 
-IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 4 AND IdTransaccion = 101) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (14, 4, 101)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 4 AND IdTransaccion = 101) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (15, 4, 101)
 
-IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 5 AND IdTransaccion = 111) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (15, 5, 111)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 5 AND IdTransaccion = 111) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (16, 5, 111)
 
-IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 6 AND IdTransaccion =   1) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (16, 6,   1)
-IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 6 AND IdTransaccion =  11) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (17, 6,  11)
-IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 6 AND IdTransaccion =  21) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (18, 6,  21)
-IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 6 AND IdTransaccion =  31) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (19, 6,  31)
-IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 6 AND IdTransaccion = 101) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (20, 6, 101)
-IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 6 AND IdTransaccion = 111) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (21, 6, 111)
-IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 6 AND IdTransaccion = 201) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (22, 6, 201)
-IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 6 AND IdTransaccion = 901) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (23, 6, 901)
-IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 6 AND IdTransaccion = 911) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (24, 6, 911)
-IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 6 AND IdTransaccion = 921) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (25, 6, 921)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 6 AND IdTransaccion =   1) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (17, 6,   1)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 6 AND IdTransaccion =  11) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (18, 6,  11)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 6 AND IdTransaccion =  12) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (19, 6,  12)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 6 AND IdTransaccion =  21) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (20, 6,  21)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 6 AND IdTransaccion =  31) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (21, 6,  31)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 6 AND IdTransaccion = 101) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (22, 6, 101)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 6 AND IdTransaccion = 111) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (23, 6, 111)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 6 AND IdTransaccion = 201) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (24, 6, 201)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 6 AND IdTransaccion = 901) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (25, 6, 901)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 6 AND IdTransaccion = 911) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (26, 6, 911)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 6 AND IdTransaccion = 921) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (27, 6, 921)
 
 SET IDENTITY_INSERT dbo.TransaccionRolSeguridad OFF
 
@@ -98,7 +101,7 @@ IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 3) INSERT INTO dbo.
 IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 4) INSERT INTO dbo.Catalogo (IdCatalogo, Nombre, Estado) VALUES (4, 'Estado Cita', 1)
 IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 5) INSERT INTO dbo.Catalogo (IdCatalogo, Nombre, Estado) VALUES (5, 'Ciudad', 1)
 IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 6) INSERT INTO dbo.Catalogo (IdCatalogo, Nombre, Estado) VALUES (6, 'Tipo Horario', 1)
-IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 101) INSERT INTO dbo.Catalogo (IdCatalogo, Nombre, Estado) VALUES (101, 'Medicamentos', 1)
+IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 101) INSERT INTO dbo.Catalogo (IdCatalogo, Nombre, Estado, Administrable) VALUES (101, 'Medicamentos', 1, 1)
 
 SET IDENTITY_INSERT dbo.Catalogo OFF
 

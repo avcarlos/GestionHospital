@@ -123,6 +123,10 @@
     <Build Include="dbo\Procedimientos Almacenados\GuardarDetalleReceta.sql" />
     <Build Include="dbo\Procedimientos Almacenados\EliminarDetalleReceta.sql" />
     <Build Include="dbo\Procedimientos Almacenados\ConsultarDetallesReceta.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarCatalogos.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ActualizarDetalleCatalogo.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\GuardarDetalleCatalogo.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\EliminarDetalleCatalogo.sql" />
   </ItemGroup>
   <ItemGroup>
     <PreDeploy Include="Scripts\PreDeployment\Script.PreDeployment.sql" />

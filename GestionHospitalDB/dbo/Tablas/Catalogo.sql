@@ -4,5 +4,6 @@
 	[Nombre]		VARCHAR(30)			NOT NULL,
 	[Descripcion]	VARCHAR(300)		NULL,
 	[Estado]		BIT					NULL,
+	[Administrable]	BIT					NULL,
 	CONSTRAINT [PK_Catalogo] PRIMARY KEY (IdCatalogo)
 )

@@ -14,9 +14,26 @@ namespace GestionHospital.Logica
     {
         private static DBManager GetConnection() => new DBManager();
 
-        #region Comun
+        #region Catálogos
 
-        public List<DetalleCatalogo> ConsultarDetallesCatalogo(int idCatalogo)
+        public List<Catalogo> ConsultarCatalogos(int idCatalogo = 0)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[1]
+            {
+                objData.CreateParameter("@i_id_catalogo", SqlDbType.Int, 4)
+            };
+
+            if (idCatalogo != 0)
+                parameters[0].Value = idCatalogo;
+
+            var catalogos = objData.ConsultarDatos<Catalogo>("ConsultarCatalogos", parameters);
+
+            return catalogos;
+        }
+
+        public List<DetalleCatalogo> ConsultarDetallesCatalogo(int idCatalogo, bool incluirInactivos = false)
         {
             var objData = GetConnection();
 
@@ -26,6 +43,9 @@ namespace GestionHospital.Logica
             };
 
             var detalles = objData.ConsultarDatos<DetalleCatalogo>("ConsultarDetalleCatalogo", parameters);
+
+            if (!incluirInactivos)
+                detalles = detalles.FindAll(d => d.Estado);
 
             return detalles;
         }
@@ -47,12 +67,56 @@ namespace GestionHospital.Logica
             if (idCatalogo != 0)
                 parameters[0].Value = idCatalogo;
 
-            var detalles = objData.ConsultarDatos<DetalleCatalogo>("ConsultarDe talleCatalogo", parameters);
+            var detalles = objData.ConsultarDatos<DetalleCatalogo>("ConsultarDetalleCatalogo", parameters);
 
             if (detalles != null && detalles.Count() > 0)
                 detalle = detalles.FirstOrDefault();
 
             return detalle;
+        }
+
+        public void GuardarDetalleCatalogo(DetalleCatalogo detalle, Usuario usuario)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[4]
+            {
+                objData.CreateParameter("@i_id_catalogo", SqlDbType.Int, 4, detalle.IdCatalogo),
+                objData.CreateParameter("@i_nombre", SqlDbType.VarChar, 50, detalle.Nombre),
+                objData.CreateParameter("@i_codigo", SqlDbType.VarChar, 10, detalle.Codigo),
+                objData.CreateParameter("@i_id_usuario", SqlDbType.Int, 4, usuario.IdUsuario)
+            };
+
+            objData.Insert("GuardarDetalleCatalogo", CommandType.StoredProcedure, parameters);
+        }
+
+        public void ActualizarDetalleCatalogo(DetalleCatalogo detalle, Usuario usuario)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[5]
+            {
+                objData.CreateParameter("@i_id_detalle_catalogo", SqlDbType.Int, 4, detalle.IdDetalleCatalogo),
+                objData.CreateParameter("@i_nombre", SqlDbType.VarChar, 50, detalle.Nombre),
+                objData.CreateParameter("@i_codigo", SqlDbType.VarChar, 10, detalle.Codigo),
+                objData.CreateParameter("@i_estado", SqlDbType.Bit, 1, detalle.Estado),
+                objData.CreateParameter("@i_id_usuario", SqlDbType.Int, 4, usuario.IdUsuario)
+            };
+
+            objData.Update("ActualizarDetalleCatalogo", CommandType.StoredProcedure, parameters);
+        }
+
+        public void EliminarDetalleCatalogo(DetalleCatalogo detalle, Usuario usuario)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[2]
+            {
+                objData.CreateParameter("@i_id_detalle_catalogo", SqlDbType.Int, 4, detalle.IdDetalleCatalogo),
+                objData.CreateParameter("@i_id_usuario", SqlDbType.Int, 4, usuario.IdUsuario)
+            };
+
+            objData.Delete("EliminarDetalleCatalogo", CommandType.StoredProcedure, parameters);
         }
 
         #endregion

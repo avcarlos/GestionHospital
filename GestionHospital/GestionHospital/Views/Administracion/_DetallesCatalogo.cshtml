@@ -1,0 +1,167 @@
+﻿@using GestionHospital.Models.Administracion
+@model DetallesCatalogoView
+@{
+    IEnumerable<SelectListItem> estadosDetallesCatalogo = new List<SelectListItem>
+    {
+        new SelectListItem{ Value = "1", Text = "Activo" },
+        new SelectListItem{ Value = "0", Text = "Inactivo" }
+    };
+}
+<h2>@ViewBag.Title.</h2>
+<h4 id="mensajeError" class="text-danger" style="display:@(string.IsNullOrEmpty(ViewBag.MessageError) ? "none" : string.Empty)">@ViewBag.MessageError.</h4>
+<h4 id="mensajeExito" class="text-info" style="display:@(string.IsNullOrEmpty(ViewBag.Message) ? "none" : string.Empty)">@ViewBag.Message.</h4>
+<div class="row">
+    <div class="col-md-11">
+        <section id="especialidadesForm">
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $('#guardar').click(function () {
+                        $('form').attr('Action', '/Administracion/GuardarDetalleCatalogo');
+                    });
+
+                    $('#actualizar').click(function () {
+                        $('form').attr('Action', '/Administracion/ActualizarDetalleCatalogo');
+                    });
+
+                    $('#eliminar').click(function () {
+                        $('form').attr('Action', '/Administracion/EliminarDetalleCatalogo');
+                    });
+
+                    $('#limpiar').click(function () {
+                        $('form').attr('Action', '/Administracion/Catalogos');
+                    });
+                })
+
+                function onRowSelectedDetalleCatalalogo() {
+                    var selectedRow;
+                    var grid = this;
+
+                    grid.select().each(function () {
+                        selectedRow = grid.dataItem($(this));
+                    });
+
+                    $('#cancelar').show();
+                    document.getElementById('eliminar').disabled = 'disabled';
+                    document.getElementById('guardar').disabled = 'disabled';
+                    document.getElementById('actualizar').disabled = '';
+
+                    $('#mensajeError').hide();
+                    $('#mensajeExito').hide();
+
+                    $('#EstadoDetalle').data('kendoComboBox').enable(false);
+
+                    $('#IdDetalleCatalogo').val(selectedRow.IdDetalleCatalogo);
+                    $('#NombreDetalle').val(selectedRow.Nombre);
+                    $('#CodigoDetalle').val(selectedRow.Codigo);
+                    $('#EstadoDetalle').data('kendoComboBox').value(selectedRow.Estado ? "1" : "0");
+                    $('#EstadoOriginalDetalleCatalogo').val(selectedRow.Estado);
+
+                    if (!selectedRow.Estado) {
+                        $('#EstadoDetalle').data('kendoComboBox').enable(true);
+                    } else {
+                        document.getElementById('eliminar').disabled = '';
+                    }
+                }
+
+                function cancelarEdicionDetalleCatalogo() {
+                    $('#cancelar').hide();
+                    document.getElementById('guardar').disabled = '';
+                    document.getElementById('actualizar').disabled = 'disabled';
+                    document.getElementById('eliminar').disabled = 'disabled';
+
+                    $('#EstadoDetalle').data('kendoComboBox').enable(false);
+
+                    $('#IdDetalleCatalogo').val(0);
+                    $('#NombreDetalle').val('');
+                    $('#CodigoDetalle').val('');
+                    $('#EstadoDetalle').data('kendoComboBox').value("0");
+                    $('#EstadoOriginalDetalleCatalogo').val(false);
+                }
+
+                function cargarGridDetallesCatalogo() {
+                    var idCatalogoParam = $('#IdCatalogo').val();
+
+                    cancelarEdicionDetalleCatalogo();
+
+                    $('#GridDetallesCatalogo').data('kendoGrid').dataSource.read({ idCatalogo: idCatalogoParam });
+                }
+            </script>
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <table style="width: 80%">
+                    <tr>
+                        <td>
+                            Catálogo:
+                        </td>
+                        <td>
+                            @Html.Kendo().DropDownListFor(m => m.IdCatalogo).BindTo(new SelectList(Model.ListaCatalogos, "IdCatalogo", "Nombre")).OptionLabel("Seleccionar").Events(events => events.Change("cargarGridDetallesCatalogo"))
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            @(
+                                Html.Kendo()
+                                .Grid<GestionHospital.Model.Shared.DetalleCatalogo>()
+                                .Name("GridDetallesCatalogo")
+                                .Columns(c =>
+                                {
+                                    c.Bound(col => col.IdDetalleCatalogo).Hidden();
+                                    c.Bound(col => col.Nombre).Title("Nombre");
+                                    c.Bound(col => col.Codigo).Title("Código");
+                                    c.Bound(col => col.Estado).Title("Estado").ClientTemplate("#: Estado ? 'Activo' : 'Inactivo' #");
+                                })
+                                .Selectable()
+                                .DataSource(dataBinding => dataBinding.Ajax()
+                                    .Read("CargarGridDetallesCatalogo", "Administracion", new { idCatalogo = Model.IdCatalogo }))
+                                .Events(events => events.Change("onRowSelectedDetalleCatalalogo"))
+                            )
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%">
+                            Nombre:
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.NombreDetalle, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.NombreDetalle, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Código:
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.CodigoDetalle, new { @class = "form-control" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Estado:
+                        </td>
+                        <td>
+                            @Html.Kendo().ComboBoxFor(model => model.EstadoDetalle).BindTo(new SelectList(estadosDetallesCatalogo, "Value", "Text")).Enable(false)
+                            @Html.ValidationMessageFor(m => m.NombreDetalle, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                </table>
+                <hr />
+                <table>
+                    <tr>
+                        <td>
+                            <input type="submit" id="guardar" value="Guardar" class="btn btn-default" />
+                            <input type="submit" id="actualizar" value="Actualizar" class="btn btn-default" disabled />
+                            <input type="submit" id="eliminar" value="Eliminar" class="btn btn-default" disabled />
+                            <input type="button" id="cancelar" value="Cancelar" class="btn btn-default" onclick="cancelarEdicionDetalleCatalogo()" style="display:none" />
+                            <input type="submit" id="limpiar" value="Limpiar" class="btn btn-default" />
+                        </td>
+                    </tr>
+                </table>
+                @Html.HiddenFor(m => m.IdDetalleCatalogo)
+                @Html.HiddenFor(m => m.EstadoOriginalDetalleCatalogo)
+            }
+        </section>
+    </div>
+</div>

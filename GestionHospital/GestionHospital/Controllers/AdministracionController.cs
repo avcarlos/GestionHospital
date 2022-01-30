@@ -920,6 +920,199 @@ namespace GestionHospital.Controllers
 
         #endregion
 
+        #region Especialidades
+
+        [AuthorizeUser(idOperacion: 12)]
+        public ActionResult Catalogos()
+        {
+            ViewBag.Title = "Gestión de catálogos";
+
+            AdministracionCore objAdministracion = new AdministracionCore();
+
+            DetallesCatalogoView vistaDetalles = new DetallesCatalogoView();
+
+            var listaCatalogos = objAdministracion.ConsultarCatalogos();
+
+            vistaDetalles.ListaCatalogos = listaCatalogos.FindAll(l => l.Administrable).OrderBy(c => c.Nombre).ToList();
+
+            return View("_DetallesCatalogo", vistaDetalles);
+        }
+
+        public JsonResult CargarGridDetallesCatalogo([DataSourceRequest] DataSourceRequest request, int idCatalogo)
+        {
+            AdministracionCore objAdministracion = new AdministracionCore();
+
+            try
+            {
+                List<DetalleCatalogo> detallesCatalogo = null;
+
+                if (idCatalogo > 0)
+                {
+                    detallesCatalogo = objAdministracion.ConsultarDetallesCatalogo(idCatalogo, true);
+
+                    if (detallesCatalogo != null)
+                    {
+                        detallesCatalogo = detallesCatalogo.OrderBy(e => e.IdDetalleCatalogo).ToList();
+                    }
+                }
+
+                if (detallesCatalogo == null)
+                    detallesCatalogo = new List<DetalleCatalogo>();
+
+                return Json(detallesCatalogo.ToDataSourceResult(request));
+            }
+            catch (Exception ex)
+            {
+                return RetornarErrorJsonResult(ex.Message);
+            }
+        }
+
+        public ActionResult GuardarDetalleCatalogo(DetallesCatalogoView vistaDetalles)
+        {
+            ViewBag.Title = "Gestión de catálogos";
+
+            AdministracionCore objAdministracion = new AdministracionCore();
+
+            List<Catalogo> listaCatalogos = new List<Catalogo>();
+
+            try
+            {
+                var usuario = (Usuario)System.Web.HttpContext.Current.Session["Usuario"];
+
+                listaCatalogos = objAdministracion.ConsultarCatalogos();
+                listaCatalogos = listaCatalogos.FindAll(l => l.Administrable).OrderBy(c => c.Nombre).ToList();
+
+                if (ModelState.IsValid)
+                {
+                    DetalleCatalogo detalleCatalogo = new DetalleCatalogo()
+                    {
+                        IdCatalogo = vistaDetalles.IdCatalogo,
+                        Nombre = vistaDetalles.NombreDetalle,
+                        Codigo = vistaDetalles.CodigoDetalle
+                    };
+
+                    objAdministracion.GuardarDetalleCatalogo(detalleCatalogo, usuario);
+
+                    int idCatalogo = vistaDetalles.IdCatalogo;
+
+                    vistaDetalles = new DetallesCatalogoView()
+                    {
+                        IdCatalogo = idCatalogo
+                    };
+
+                    ModelState.Clear();
+
+                    ViewBag.Message = "Detalle Guardado Correctamente";
+                }
+            }
+            catch (Exception ex)
+            {
+                ViewBag.MessageError = ex.Message;
+            }
+
+            vistaDetalles.ListaCatalogos = listaCatalogos;
+
+            return View("_DetallesCatalogo", vistaDetalles);
+        }
+
+        public ActionResult ActualizarDetalleCatalogo(DetallesCatalogoView vistaDetalles)
+        {
+            ViewBag.Title = "Gestión de catálogos";
+
+            AdministracionCore objAdministracion = new AdministracionCore();
+
+            List<Catalogo> listaCatalogos = new List<Catalogo>();
+
+            try
+            {
+                var usuario = (Usuario)System.Web.HttpContext.Current.Session["Usuario"];
+
+                listaCatalogos = objAdministracion.ConsultarCatalogos();
+                listaCatalogos = listaCatalogos.FindAll(l => l.Administrable).OrderBy(c => c.Nombre).ToList();
+
+                if (ModelState.IsValid)
+                {
+                    DetalleCatalogo detalleCatalogo = new DetalleCatalogo()
+                    {
+                        IdCatalogo = vistaDetalles.IdCatalogo,
+                        IdDetalleCatalogo = vistaDetalles.IdDetalleCatalogo,
+                        Nombre = vistaDetalles.NombreDetalle,
+                        Codigo = vistaDetalles.CodigoDetalle,
+                        Estado = vistaDetalles.EstadoOriginalDetalleCatalogo ? true : vistaDetalles.EstadoDetalle == 1
+                    };
+
+                    objAdministracion.ActualizarDetalleCatalogo(detalleCatalogo, usuario);
+
+                    int idCatalogo = vistaDetalles.IdCatalogo;
+
+                    vistaDetalles = new DetallesCatalogoView()
+                    {
+                        IdCatalogo = idCatalogo
+                    };
+
+                    ModelState.Clear();
+
+                    ViewBag.Message = "Detalle Actualizado Correctamente";
+                }
+            }
+            catch (Exception ex)
+            {
+                ViewBag.MessageError = ex.Message;
+            }
+
+            vistaDetalles.ListaCatalogos = listaCatalogos;
+
+            return View("_DetallesCatalogo", vistaDetalles);
+        }
+
+        public ActionResult EliminarDetalleCatalogo(DetallesCatalogoView vistaDetalles)
+        {
+            ViewBag.Title = "Gestión de catálogos";
+
+            AdministracionCore objAdministracion = new AdministracionCore();
+
+            List<Catalogo> listaCatalogos = new List<Catalogo>();
+
+            try
+            {
+                var usuario = (Usuario)System.Web.HttpContext.Current.Session["Usuario"];
+
+                listaCatalogos = objAdministracion.ConsultarCatalogos();
+                listaCatalogos = listaCatalogos.FindAll(l => l.Administrable).OrderBy(c => c.Nombre).ToList();
+
+                if (ModelState.IsValid)
+                {
+                    DetalleCatalogo detalleCatalogo = new DetalleCatalogo()
+                    {
+                        IdDetalleCatalogo = vistaDetalles.IdDetalleCatalogo
+                    };
+
+                    objAdministracion.EliminarDetalleCatalogo(detalleCatalogo, usuario);
+
+                    int idCatalogo = vistaDetalles.IdCatalogo;
+
+                    vistaDetalles = new DetallesCatalogoView()
+                    {
+                        IdCatalogo = idCatalogo
+                    };
+
+                    ModelState.Clear();
+
+                    ViewBag.Message = "Detalle Eliminado Correctamente";
+                }
+            }
+            catch (Exception ex)
+            {
+                ViewBag.MessageError = ex.Message;
+            }
+
+            vistaDetalles.ListaCatalogos = listaCatalogos;
+
+            return View("_DetallesCatalogo", vistaDetalles);
+        }
+
+        #endregion
+
         #region Comunes
 
         private JsonResult RetornarErrorJsonResult(string mensajeError)

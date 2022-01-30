@@ -184,6 +184,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\Administracion\DetallesCatalogoView.cs" />
     <Compile Include="Models\Administracion\EspecialidadesView.cs" />
     <Compile Include="Models\Administracion\PacienteLineaView.cs" />
     <Compile Include="Models\Administracion\PacienteView.cs" />
@@ -2790,6 +2791,7 @@
     <Content Include="Views\Administracion\_Especialidades.cshtml" />
     <Content Include="Views\Seguridad\_Permisos.cshtml" />
     <Content Include="Views\Seguridad\_RolesSeguridad.cshtml" />
+    <Content Include="Views\Administracion\_DetallesCatalogo.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

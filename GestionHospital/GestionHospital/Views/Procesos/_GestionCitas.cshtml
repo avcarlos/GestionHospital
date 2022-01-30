@@ -1,0 +1,272 @@
+﻿@using GestionHospital.Models.Procesos
+@model GestionCitasView
+@{
+    var identificacion = ViewData.TemplateInfo.GetFullHtmlFieldId("IdentificacionMedico");
+}
+<h2>@ViewBag.Title.</h2>
+<h4 id="mensajeError" class="text-danger" style="display:@(string.IsNullOrEmpty(ViewBag.MessageError) ? "none" : string.Empty)">@ViewBag.MessageError.</h4>
+<h4 id="mensajeExito" class="text-info" style="display:@(string.IsNullOrEmpty(ViewBag.Message) ? "none" : string.Empty)">@ViewBag.Message.</h4>
+<div class="row">
+    <div class="col-md-11">
+        <section id="citaForm">
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $('#guardar').click(function () {
+                        $('form').attr('Action', '/Procesos/GuardarDatosCita');
+                    });
+
+                    $('#limpiar').click(function () {
+                        $('form').attr('Action', '/Procesos/AgendaCitas');
+                    });
+
+                    $('#@identificacion').change(
+                        function (event) {
+                            var identificacionParam = $('#@identificacion').val();
+
+                            $('#mensajeError').hide();
+                            $('#mensajeExito').hide();
+
+                            document.getElementById('guardar').disabled = 'disabled';
+
+                            $('#IdMedico').val(0);
+                            $('#NombreMedico').val('');
+                            $('#IdCita').val(0);
+                            $('#NombreEspecialidad').val('');
+                            $('#HoraCita').val('');
+                            $('#NombrePaciente').val('');
+                            $('#Motivo').val('');
+                            $('#Diagnostico').val('');
+                            $('#Examenes').val('');
+                            $('#Receta').val('');
+                            $('#IdEstadoCita').data('kendoDropDownList').value(0);
+
+                            cargarGridCitas();
+
+                            if (identificacionParam == "")
+                                return;
+
+                            mostrarVentanaCargando();
+
+                            $.ajax({
+                                type: "POST",
+                                url: '@Url.Action("ConsultarMedicoCitas", "Procesos")',
+                                data: { identificacion: identificacionParam },
+                                success: function (result) {
+                                    if (result != "") {
+                                        $('#IdMedico').val(result.idMedico);
+                                        $('#NombreMedico').val(result.nombreMedico);
+
+                                        cargarGridCitas();
+                                    }
+                                },
+                                error: function (err) {
+                                    alert('Error al consultar médico: ' + err.responseJSON);
+                                },
+                                complete: function () {
+                                    cerrarVentanaCargando();
+                                }
+                            });
+                        }
+                    );
+                })
+
+                function cargarGridCitas() {
+                    var idMedicoParam = $('#IdMedico').val();
+                    var fechaParam = $('#FechaConsulta').val();
+
+                    $('#GridCitas').data('kendoGrid').dataSource.read({ IdMedico: idMedicoParam, fechaCitas: fechaParam });
+                }
+
+                function onRowSelectedCita() {
+	                var selectedRow;
+	                var grid = this;
+
+	                grid.select().each(function () {
+		                selectedRow = grid.dataItem($(this));
+                    });
+
+                    $('.datosCita').show();
+                    document.getElementById('guardar').disabled = '';
+
+                    $('#IdCita').val(selectedRow.IdCita);
+                    $('#FechaCita').data('kendoDatePicker').value(selectedRow.Fecha);
+                    $('#HoraCita').val(selectedRow.NombreHorario);
+                    $('#NombrePaciente').val(selectedRow.NombrePaciente);
+                    $('#Motivo').val(selectedRow.Motivo);
+                    $('#Diagnostico').val(selectedRow.Diagnostico);
+                    $('#Examenes').val(selectedRow.Examenes);
+                    $('#Receta').val(selectedRow.Receta);
+                    $('#IdEstadoCita').data('kendoDropDownList').value(selectedRow.IdEstado);
+                    $('#FechaProximoControl').data('kendoDatePicker').value(selectedRow.FechaProximoControl);
+                }
+            </script>
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <table style="width: 80%">
+                    <tr>
+                        <td>
+                            Identificación:
+                        </td>
+                        <td>
+                            @if (Model.EsMedico)
+                            {
+                                @Html.TextBoxFor(m => m.IdentificacionMedico, new { @readonly = "readonly", @class = "form-control" })
+                            }
+                            else
+                            {
+                                @Html.TextBoxFor(m => m.IdentificacionMedico, new { @class = "form-control" })
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Médico:
+                        </td>
+                        <td>
+                            @if (Model.EsMedico)
+                            {
+                                @Html.TextBoxFor(model => model.NombreMedico, new { @readonly = "readonly", @class = "form-control" })
+                            }
+                            else
+                            {
+                                @Html.TextBoxFor(model => model.NombreMedico, new { @class = "form-control" })
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:20%">
+                            Fecha Consulta:
+                        </td>
+                        <td>
+                            @Html.Kendo().DatePickerFor(model => model.FechaConsulta).Min(Model.FechaActual)
+                            <input type="button" id="consultar" value="Consultar" class="btn btn-default" onclick="cargarGridCitas()" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Citas:
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            @(
+                                Html.Kendo()
+                                .Grid<GestionHospital.Model.Shared.CitaMedica>()
+                                .Name("GridCitas")
+                                .Columns(c =>
+                                {
+                                    c.Bound(col => col.IdCita).Hidden();
+                                    c.Bound(col => col.Fecha).Title("Fecha").Format("{0:dd/MM/yyyy}");
+                                    c.Bound(col => col.NombreHorario).Title("Horario");
+                                    c.Bound(col => col.NombreEspecialidad).Title("Especialidad");
+                                    c.Bound(col => col.NombrePaciente).Title("Paciente");
+                                    c.Bound(col => col.EdadPaciente).Title("Edad");
+                                    c.Bound(col => col.Motivo);
+                                })
+                                .Selectable()
+                                .DataSource(dataBinding => dataBinding.Ajax()
+                                    .Read("CargarCitasPendientesMedico", "Procesos", new { idMedico = Model.IdMedico, fechaCitas = Model.FechaConsulta }))
+                                .Events(events => events.Change("onRowSelectedCita") )
+                                .AutoBind(false)
+                            )
+                        </td>
+                    </tr>
+                    <tr class="datosCita" style="display:none">
+                        <td>
+                            Fecha:
+                        </td>
+                        <td>
+                            @Html.Kendo().DatePickerFor(model => model.FechaCita).Enable(false)
+                        </td>
+                    </tr>
+                    <tr class="datosCita" style="display:none">
+                        <td>
+                            Hora:
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.HoraCita, new { @readonly = "readonly", @class = "form-control" })
+                        </td>
+                    </tr>
+                    <tr class="datosCita" style="display:none">
+                        <td>
+                            Paciente:
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.NombrePaciente, new { @readonly = "readonly", @class = "form-control" })
+                        </td>
+                    </tr>
+                    <tr class="datosCita" style="display:none">
+                        <td>
+                            Motivo:
+                        </td>
+                        <td colspan="2">
+                            @Html.TextAreaFor(m => m.Motivo, 3, 500, new { style = "width: 80%; max-width: 100%", @readonly = "readonly", @class = "form-control" })
+                        </td>
+                    </tr>
+                    <tr class="datosCita" style="display:none">
+                        <td>
+                            Diagnóstico:
+                        </td>
+                        <td colspan="2">
+                            @Html.TextAreaFor(m => m.Diagnostico, 3, 500, new { style = "width: 80%; max-width: 100%", @class = "form-control" })
+                        </td>
+                    </tr>
+                    <tr class="datosCita" style="display:none">
+                        <td>
+                            Exámenes:
+                        </td>
+                        <td colspan="2">
+                            @Html.TextAreaFor(m => m.Examenes, 3, 500, new { style = "width: 80%; max-width: 100%", @class = "form-control" })
+                        </td>
+                    </tr>
+                    <tr class="datosCita" style="display:none">
+                        <td>
+                            Receta:
+                        </td>
+                        <td colspan="2">
+                            @Html.TextAreaFor(m => m.Receta, 3, 500, new { style = "width: 80%; max-width: 100%", @class = "form-control" })
+                        </td>
+                    </tr>
+                    <tr class="datosCita" style="display:none">
+                        <td>
+                            Estado:
+                        </td>
+                        <td colspan="2">
+                            @Html.Kendo().DropDownListFor(m => m.IdEstadoCita).BindTo(new SelectList(Model.ListaEstados, "IdDetalleCatalogo", "Nombre"))
+                        </td>
+                    </tr>
+                    <tr class="datosCita" style="display:none">
+                        <td style="width:20%">
+                            Fecha Próximo Control:
+                        </td>
+                        <td>
+                            @Html.Kendo().DatePickerFor(model => model.FechaProximoControl).Min(Model.FechaActual)
+                        </td>
+                    </tr>
+                </table>
+                <hr />
+                <table>
+                    <tr>
+                        <td>
+                            <input type="submit" id="guardar" value="Guardar" class="btn btn-default" disabled />
+                            <input type="submit" id="limpiar" value="Limpiar" class="btn btn-default" />
+                        </td>
+                    </tr>
+                </table>
+                @Html.HiddenFor(m => m.IdMedico)
+                @Html.HiddenFor(m => m.IdCita)
+                @Html.HiddenFor(m => m.EsMedico)
+                @Html.HiddenFor(m => m.FechaActual)
+
+                <script type="text/javascript">
+                    $(document).ready(function () {
+                        $('#@identificacion').trigger("change");
+                    })
+                </script>
+            }
+        </section>
+    </div>
+</div>

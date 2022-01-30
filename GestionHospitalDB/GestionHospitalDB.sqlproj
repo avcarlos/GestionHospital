@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>GestionHospitalDB</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{0965f88a-db21-4b28-a3da-5b41db0614bd}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql130DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>GestionHospitalDB</RootNamespace>
+    <AssemblyName>GestionHospitalDB</AssemblyName>
+    <ModelCollation>1033, CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="Scripts" />
+    <Folder Include="Scripts\PreDeployment" />
+    <Folder Include="Scripts\PostDeployment" />
+    <Folder Include="dbo" />
+    <Folder Include="dbo\Procedimientos Almacenados" />
+    <Folder Include="dbo\Tablas" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarUsuario.sql" />
+    <Build Include="dbo\Tablas\Usuario.sql" />
+    <Build Include="dbo\Tablas\Transaccion.sql" />
+    <Build Include="dbo\Tablas\RolSeguridad.sql" />
+    <Build Include="dbo\Tablas\TransaccionRolSeguridad.sql" />
+    <Build Include="dbo\Tablas\Persona.sql" />
+    <Build Include="dbo\Tablas\Especialidad.sql" />
+    <Build Include="dbo\Tablas\EspecialidadMedico.sql" />
+    <Build Include="dbo\Tablas\Horario.sql" />
+    <Build Include="dbo\Tablas\Factura.sql" />
+    <Build Include="dbo\Tablas\Cita.sql" />
+    <Build Include="dbo\Tablas\TipoPersona.sql" />
+    <Build Include="dbo\Tablas\Catalogo.sql" />
+    <Build Include="dbo\Tablas\DetalleCatalogo.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarTransaccionesUsuario.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\GuardarUsuario.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarPersona.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarDetalleCatalogo.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\GuardarPersona.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ActualizarPersona.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\EliminarPersona.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarEspecialidades.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarTipoPersona.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarEspecialidadesMedico.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\GuardarEspecialidadMedico.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\EliminarEspecialidadMedico.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\GuardarTipoPersona.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\EliminarTipoPersona.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarPersonaId.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\RegistrarPersonaUsuario.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarPersonaEmail.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarUsuarioPersona.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarCitas.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarHorarios.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarMedicosEspecialidad.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\GuardarCita.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ActualizarCita.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\EliminarCita.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\GuardarDatosAdicionalesCita.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\GuardarEspecialidad.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ActualizarEspecialidad.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\EliminarEspecialidad.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarTransacciones.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ActualizarTransaccion.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\EliminarTransaccion.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\GuardarRolSeguridad.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\EliminarRolSeguridad.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarRolesSeguridad.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ActualizarRolSeguridad.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarTransaccionesRolSeguridad.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\EliminarTransaccionRolSeguridad.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\GuardarTransaccionRolSeguridad.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PreDeploy Include="Scripts\PreDeployment\Script.PreDeployment.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="Scripts\PostDeployment\Script.PostDeployment.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HospitalElOroDB.publish.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="GestionHospitalDB.refactorlog" />
+  </ItemGroup>
+</Project>

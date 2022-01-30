@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Gestión Hospital</title>
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/kendo/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/kendo")
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                @Html.ActionLink("Hospital Básico El Oro", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                @Html.Partial("_LoginPartial")
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        @(Html.Kendo().Menu()
+                    .Name("menu")
+                    .DataTextField("Nombre")
+                    .DataUrlField("UrlTransaccion")
+                    .DataSource(dataSource => dataSource
+                        .Read(read => read
+                            .Action("GetTransacciones", "Home")
+                        )
+                    ))
+    </div>
+    <div id="windowLoading" style="display:none">
+        Cargando...<img src="@Url.Content("~/Content/images/loading.gif")" />
+    </div>
+    <div class="container body-content">
+        
+        @RenderBody()
+        <hr />
+    </div>
+
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

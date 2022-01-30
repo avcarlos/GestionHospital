@@ -1,0 +1,290 @@
+﻿@using GestionHospital.Models.Administracion
+@model PersonalMedicoView
+@{
+    var identificacion = ViewData.TemplateInfo.GetFullHtmlFieldId("Identificacion");
+}
+
+@{
+    IEnumerable<SelectListItem> estadosMedico = new List<SelectListItem>
+    {
+        new SelectListItem{ Value = "1", Text = "Activo" },
+        new SelectListItem{ Value = "0", Text = "Inactivo" }
+    };
+}
+<h2>@ViewBag.Title.</h2>
+<h4 id="mensajeError" class="text-danger" style="display:@(string.IsNullOrEmpty(ViewBag.MessageError) ? "none" : string.Empty)">@ViewBag.MessageError.</h4>
+<h4 id="mensajeExito" class="text-info" style="display:@(string.IsNullOrEmpty(ViewBag.Message) ? "none" : string.Empty)">@ViewBag.Message.</h4>
+<div class="row">
+    <div class="col-md-11">
+        <section id="medicoForm">
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $('#guardar').click(function () {
+                        $('form').attr('Action', '/Administracion/GuardarMedico');
+                    });
+
+                    $('#actualizar').click(function () {
+                        $('form').attr('Action', '/Administracion/ActualizarMedico');
+                    });
+
+                    $('#eliminar').click(function () {
+                        $('form').attr('Action', '/Administracion/EliminarMedico');
+                    });
+
+                    $('#limpiar').click(function () {
+                        $('form').attr('Action', '/Administracion/PersonalMedico');
+                    });
+
+                    $('#@identificacion').change(
+                        function (event) {
+                            var idTipoIdentificacionParam = $('#IdTipoIdentificacion').data('kendoDropDownList').value();
+                            var identificacionParam = $('#@identificacion').val();
+
+                            $('#mensajeError').hide();
+                            $('#mensajeExito').hide();
+
+                            document.getElementById('guardar').disabled = 'disabled';
+                            document.getElementById('actualizar').disabled = 'disabled';
+                            document.getElementById('eliminar').disabled = 'disabled';
+
+                            $('#IdPersona').val(0);
+                            $('#Nombres').val('');
+                            $('#Apellidos').val('');
+                            $('#Email').val('');
+                            $('#Telefono').val('');
+                            $('#Direccion').val('');
+                            $('#IdCiudad').data('kendoDropDownList').value();
+                            $('#IdGenero').data('kendoDropDownList').value();
+                            $('#FechaNacimiento').data('kendoDatePicker').value();
+                            $('#Estado').data('kendoComboBox').value();
+                            $('#IdTipoPersona').val(0);
+
+                            refrescarGridEspecialidades();
+
+                            if (identificacionParam == "")
+                                return;
+
+                            mostrarVentanaCargando();
+
+                            $.ajax({
+                                type: "POST",
+                                url: '@Url.Action("ConsultarMedico", "Administracion")',
+                                data: { idTipoIdentificacion: idTipoIdentificacionParam, identificacion: identificacionParam },
+                                success: function (result) {
+                                    if (result != "") {
+                                        if (result.IdTipo != 5) {
+                                            alert('Aún no ha sido registrado como médico.');
+
+                                            document.getElementById('guardar').disabled = '';
+                                        } else {
+                                            document.getElementById('actualizar').disabled = '';
+
+                                            if (result.EstadoTipo) {
+                                                document.getElementById('eliminar').disabled = '';
+                                            } else {
+                                                $('#estadoMedico').show();
+                                            }
+                                            
+                                            refrescarGridEspecialidades();
+                                        }
+
+                                        $('#IdPersona').val(result.IdPersona);
+                                        $('#Nombres').val(result.Nombres);
+                                        $('#Apellidos').val(result.Apellidos);
+                                        $('#Email').val(result.Email);
+                                        $('#Telefono').val(result.Telefono);
+                                        $('#Direccion').val(result.Direccion);
+                                        $('#IdCiudad').data('kendoDropDownList').value(result.IdCiudad);
+                                        $('#IdGenero').data('kendoDropDownList').value(result.IdGenero);
+                                        $('#FechaNacimiento').data('kendoDatePicker').value(result.FechaNacimiento);
+                                        $('#Estado').data('kendoComboBox').value(result.EstadoTipo ? "1" : "0");
+                                        $('#IdTipoPersona').val(result.IdTipo);
+                                    } else {
+                                        document.getElementById('guardar').disabled = '';
+                                    }
+                                },
+                                error: function (err) {
+                                    alert('Error al consultar médico: ' + err.responseJSON);
+                                },
+                                complete: function () {
+                                    cerrarVentanaCargando();
+                                }
+                            });
+                        }
+                    );
+                })
+
+                function mostrarErrorGrid(e) {
+                    if (e.status = "error") {
+                        var message = e.xhr.responseText;
+                        alert(message);
+                    }
+                }
+
+                function refrescarGridEspecialidades(e) {
+                    var identificacionParam = $('#@identificacion').val();
+
+                    $('#GridEspecialidades').data('kendoGrid').dataSource.read({ identificacion: identificacionParam});
+                }
+
+                function parametrosGrid() {
+                    var identificacionParam = $('#@identificacion').val();
+
+                    return { identificacion: identificacionParam };
+                }
+            </script>
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <table style="width: 80%">
+                    <tr>
+                        <td>
+                            Tipo Identificación:
+                        </td>
+                        <td>
+                            @Html.Kendo().DropDownListFor(m => m.IdTipoIdentificacion).BindTo(new SelectList(Model.ListaTiposIdentificaciones, "IdDetalleCatalogo", "Nombre"))
+                            @Html.ValidationMessageFor(m => m.IdTipoIdentificacion, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Identificación:
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.Identificacion, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Identificacion, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Nombres:
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.Nombres, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Nombres, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Apellidos:
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.Apellidos, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Apellidos, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Correo Electrónico:
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Teléfono:
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.Telefono, new { @class = "form-control" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Dirección:
+                        </td>
+                        <td style="width:80%">
+                            @Html.TextAreaFor(m => m.Direccion, new { style = "width:100%; height:80%", @class = "form-control" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Ciudad Residencia:
+                        </td>
+                        <td>
+                            @Html.Kendo().DropDownListFor(m => m.IdCiudad).BindTo(new SelectList(Model.ListaCiudades, "IdDetalleCatalogo", "Nombre")).OptionLabel("Seleccionar")
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Fecha Nacimiento:
+                        </td>
+                        <td>
+                            @Html.Kendo().DatePickerFor(m => m.FechaNacimiento).Max(Model.FechaActual)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Género:
+                        </td>
+                        <td>
+                            @Html.Kendo().DropDownListFor(m => m.IdGenero).BindTo(new SelectList(Model.ListaGeneros, "IdDetalleCatalogo", "Nombre"))
+                        </td>
+                    </tr>
+                    <tr id="estadoMedico" style="display:none">
+                        <td>
+                            Estado:
+                        </td>
+                        <td>
+                            @Html.Kendo().ComboBoxFor(model => model.Estado).BindTo(new SelectList(estadosMedico, "Value", "Text"))
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Especialidades:
+                        </td>
+                        <td>
+                            @(
+                                Html.Kendo()
+                                    .Grid<GestionHospital.Model.Shared.Especialidad>()
+                                    .Name("GridEspecialidades")
+                                    .Columns(c =>
+                                    {
+                                        c.Bound(col => col.IdEspecialidadMedico).Hidden(true);
+                                        c.ForeignKey(h => h.IdEspecialidad, Model.ListaEspecialidades, "IdEspecialidad", "Nombre").Title("Especialidad").HeaderHtmlAttributes(new { style = "text-align:center" });
+                                        c.Command(command =>
+                                        {
+                                            command.Edit().Text("Editar").UpdateText("Guardar").CancelText("Cancelar");
+                                            command.Destroy().Text("Eliminar");
+                                        }).Width(250);
+                                    })
+                                    .DataSource(dataBinding => dataBinding.Ajax()
+                                        .Events(events => events.Error("mostrarErrorGrid").Sync("refrescarGridEspecialidades"))
+                                        .Model(model =>
+                                        {
+                                            model.Id(m => m.IdEspecialidadMedico);
+                                        })
+                                            .Read(read => read.Action("ConsultarEspecialidadesMedico", "Administracion").Data("parametrosGrid"))
+                                            .Update(update => update.Action("ActualizarEspecialidadMedico", "Administracion").Data("parametrosGrid"))
+                                            .Create(create => create.Action("GuardarEspecialidadMedico", "Administracion").Data("parametrosGrid"))
+                                            .Destroy(destroy => destroy.Action("EliminarEspecialidadMedica", "Administracion").Data("parametrosGrid"))
+                                        )
+                                    .ToolBar(toolBar => toolBar.Create().Text("Nuevo"))
+                                    .Editable(editable => editable.Mode(Kendo.Mvc.UI.GridEditMode.InLine).ConfirmDelete("Eliminar especialidad").DisplayDeleteConfirmation("Seguro desea eliminar la especialidad?"))
+                                    .Scrollable(s => s.Height("auto"))
+                                    .Resizable(r => r.Columns(true))
+                            )
+                        </td>
+                    </tr>
+                </table>
+                <hr />
+                <table>
+                    <tr>
+                        <td>
+                            <input type="submit" id="guardar" value="Guardar" class="btn btn-default" @(string.IsNullOrEmpty(Model.Identificacion) ? "disabled" : "") />
+                            <input type="submit" id="actualizar" value="Actualizar" class="btn btn-default" @(Model.IdTipoPersona != 5 ? "disabled" : "") />
+                            <input type="submit" id="eliminar" value="Eliminar" class="btn btn-default" @(Model.IdTipoPersona != 5 ? "disabled" : "") />
+                            <input type="submit" id="limpiar" value="Limpiar" class="btn btn-default" />
+                        </td>
+                    </tr>
+                </table>
+                @Html.HiddenFor(m => m.IdPersona)
+                @Html.HiddenFor(m => m.IdTipoPersona)
+                @Html.HiddenFor(m => m.FechaActual)
+            }
+        </section>
+    </div>
+</div>

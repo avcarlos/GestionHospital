@@ -34,12 +34,15 @@ namespace GestionHospital.Model.Shared
 
         public string Observaciones { get; set; }
 
-        public string Examenes { get; set; }
-
-        public string Receta { get; set; }
-
         public DateTime? FechaProximoControl { get; set; }
 
         public int IdEstado { get; set; }
+
+        public Receta Receta { get; set; }
+
+        public CitaMedica()
+        {
+            Receta = new Receta();
+        }
     }
 }

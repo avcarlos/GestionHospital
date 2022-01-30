@@ -8,8 +8,6 @@
 	[Motivo]				VARCHAR(300)		NULL,
 	[Diagnostico]			VARCHAR(300)		NULL,
 	[Observaciones]			VARCHAR(300)		NULL,
-	[Examenes]				VARCHAR(300)		NULL,
-	[Receta]				VARCHAR(300)		NULL,
 	[FechaProximoControl]	DATETIME			NULL,
 	[IdEstado]				INT					NULL,
 	[Reagendada]			BIT					NULL,

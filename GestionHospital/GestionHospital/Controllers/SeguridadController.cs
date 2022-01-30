@@ -78,7 +78,7 @@ namespace GestionHospital.Controllers
                     {
                         transacciones = objSeguridad.ConsultarTransaccionesRolSeguridad(idRolSeguridad);
 
-                        Session["Transacciones-" + idTemp] = transacciones;
+                        Session["Transacciones-" + idRolSeguridad.ToString()] = transacciones;
                     }
                 }
                 else

@@ -114,6 +114,8 @@
                     setTimeout(function () {
                         $('#dropDownMedico').data('kendoDropDownList').value(selectedRow.IdMedico);
                         setTimeout(function () {
+                            consultarHorariosDisponibles();
+
                             $('#dropDownHorario').data('kendoDropDownList').value(selectedRow.IdHorario);
                         }, 1000);
                     }, 1000);

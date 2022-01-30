@@ -23,9 +23,6 @@
                         function (event) {
                             var identificacionParam = $('#@identificacion').val();
 
-                            $('#mensajeError').hide();
-                            $('#mensajeExito').hide();
-
                             document.getElementById('guardar').disabled = 'disabled';
 
                             $('#IdMedico').val(0);
@@ -95,9 +92,33 @@
                     $('#Motivo').val(selectedRow.Motivo);
                     $('#Diagnostico').val(selectedRow.Diagnostico);
                     $('#Examenes').val(selectedRow.Examenes);
-                    $('#Receta').val(selectedRow.Receta);
+                    $('#Receta_IdReceta').val(selectedRow.Receta.IdReceta);
+                    $('#Receta_Observaciones').val(selectedRow.Receta.Observaciones);
                     $('#IdEstadoCita').data('kendoDropDownList').value(selectedRow.IdEstado);
                     $('#FechaProximoControl').data('kendoDatePicker').value(selectedRow.FechaProximoControl);
+
+                    refrescarGridReceta();
+                }
+
+                function mostrarErrorGrid(e) {
+                    if (e.status = "error") {
+                        var message = e.xhr.responseText;
+                        alert(message);
+                    }
+                }
+
+                function refrescarGridReceta() {
+                    var idRecetaParam = $('#Receta_IdReceta').val();
+                    var idTempParam = $('#IdTemp').val();
+
+                    $('#GridReceta').data('kendoGrid').dataSource.read({ idReceta: idRecetaParam, idTemp: idTempParam });
+                }
+
+                function parametrosGridReceta() {
+                    var idRecetaParam = $('#Receta_IdReceta').val();
+                    var idTempParam = $('#IdTemp').val();
+
+                    return { idReceta: idRecetaParam, idTemp: idTempParam };
                 }
             </script>
             @using (Html.BeginForm())
@@ -226,8 +247,46 @@
                         <td>
                             Receta:
                         </td>
+                        <td colspan="3">
+                            @(
+                                Html.Kendo()
+                                    .Grid<GestionHospital.Model.Shared.DetalleReceta>()
+                                    .Name("GridReceta")
+                                    .Columns(c =>
+                                    {
+                                        c.Bound(col => col.IdDetalleReceta).Hidden(true);
+                                        c.ForeignKey(h => h.IdMedicamento, Model.ListaMedicamentos, "IdDetalleCatalogo", "Nombre").Title("Medicamento").HeaderHtmlAttributes(new { style = "text-align:center" });
+                                        c.Bound(col => col.Indicaciones).Title("Indicaciones").Width(200).HeaderHtmlAttributes(new { style = "text-align:center" });
+                                        c.Command(command =>
+                                        {
+                                            command.Edit().Text("Editar").UpdateText("Guardar").CancelText("Cancelar");
+                                            command.Destroy().Text("Eliminar");
+                                        }).Width(250);
+                                    })
+                                    .DataSource(dataBinding => dataBinding.Ajax()
+                                        .Events(events => events.Error("mostrarErrorGrid").Sync("refrescarGridReceta"))
+                                        .Model(model =>
+                                        {
+                                            model.Id(m => m.IdDetalleReceta);
+                                        })
+                                            .Read(read => read.Action("ConsultarDetalleReceta", "Procesos").Data("parametrosGridReceta"))
+                                            .Update(update => update.Action("ActualizarDetalleReceta", "Procesos").Data("parametrosGridReceta"))
+                                            .Create(create => create.Action("GuardarDetalleReceta", "Procesos").Data("parametrosGridReceta"))
+                                            .Destroy(destroy => destroy.Action("EliminarDetalleReceta", "Procesos").Data("parametrosGridReceta"))
+                                        )
+                                    .ToolBar(toolBar => toolBar.Create().Text("Nuevo"))
+                                    .Editable(editable => editable.Mode(Kendo.Mvc.UI.GridEditMode.InLine).ConfirmDelete("Eliminar detalle").DisplayDeleteConfirmation("Seguro desea eliminar el detalle?"))
+                                    .Scrollable(s => s.Height("auto"))
+                                    .Resizable(r => r.Columns(true))
+                                    .AutoBind(false)
+                            )
+                        </td>
+                    </tr>
+                    <tr class="datosCita" style="display:none">
+                        <td>
+                        </td>
                         <td colspan="2">
-                            @Html.TextAreaFor(m => m.Receta, 3, 500, new { style = "width: 80%; max-width: 100%", @class = "form-control" })
+                            @Html.TextAreaFor(m => m.Receta.Observaciones, 3, 500, new { style = "width: 80%; max-width: 100%", @class = "form-control" })
                         </td>
                     </tr>
                     <tr class="datosCita" style="display:none">
@@ -260,6 +319,8 @@
                 @Html.HiddenFor(m => m.IdCita)
                 @Html.HiddenFor(m => m.EsMedico)
                 @Html.HiddenFor(m => m.FechaActual)
+                @Html.HiddenFor(m => m.Receta.IdReceta)
+                @Html.HiddenFor(m => m.IdTemp)
 
                 <script type="text/javascript">
                     $(document).ready(function () {

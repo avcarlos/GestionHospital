@@ -6,6 +6,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace GestionHospital.Logica
 {
@@ -129,26 +130,6 @@ namespace GestionHospital.Logica
             objData.Insert("GuardarCita", CommandType.StoredProcedure, parameters);
         }
 
-        public void GuardarDatosAdicionalesCita(CitaMedica cita)
-        {
-            var objData = GetConnection();
-
-            IDbDataParameter[] parameters = new IDbDataParameter[6]
-            {
-                objData.CreateParameter("@i_id_cita", SqlDbType.Int, 4, cita.IdCita),
-                objData.CreateParameter("@i_diagnostico", SqlDbType.VarChar, 300, cita.Diagnostico),
-                objData.CreateParameter("@i_examenes", SqlDbType.VarChar, 300, cita.Examenes),
-                objData.CreateParameter("@i_receta", SqlDbType.VarChar, 300, cita.Receta),
-                objData.CreateParameter("@i_id_estado", SqlDbType.Int, 4, cita.IdEstado),
-                objData.CreateParameter("@i_fecha_proximo_control", SqlDbType.DateTime, 8)
-            };
-
-            if (cita.FechaProximoControl != null)
-                parameters[5].Value = cita.FechaProximoControl.GetValueOrDefault();
-
-            objData.Insert("GuardarDatosAdicionalesCita", CommandType.StoredProcedure, parameters);
-        }
-
         public void ActualizarCita(CitaMedica cita)
         {
             if (cita != null)
@@ -199,9 +180,169 @@ namespace GestionHospital.Logica
                 cita.NombreHorario = datosCita.NombreHorario;
                 cita.NombrePaciente = datosCita.NombrePaciente;
                 cita.EdadPaciente = datosCita.EdadPaciente;
+                cita.Receta = ConsultarReceta(cita.IdCita, null);
             }
 
             return citas;
+        }
+
+        public void GuardarDatosAdicionalesCita(CitaMedica cita)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[4]
+            {
+                objData.CreateParameter("@i_id_cita", SqlDbType.Int, 4, cita.IdCita),
+                objData.CreateParameter("@i_diagnostico", SqlDbType.VarChar, 300, cita.Diagnostico),
+                objData.CreateParameter("@i_id_estado", SqlDbType.Int, 4, cita.IdEstado),
+                objData.CreateParameter("@i_fecha_proximo_control", SqlDbType.DateTime, 8)
+            };
+
+            if (cita.FechaProximoControl != null)
+                parameters[3].Value = cita.FechaProximoControl.GetValueOrDefault();
+
+            objData.Insert("GuardarDatosAdicionalesCita", CommandType.StoredProcedure, parameters);
+        }
+
+        public void GuardarResultadoCita(CitaMedica cita, Usuario usuario)
+        {
+            List<DetalleReceta> detallesRecetaGuardar = new List<DetalleReceta>();
+            List<DetalleReceta> detallesRecetaEliminar = new List<DetalleReceta>();
+
+            if (cita.Receta.IdReceta == 0)
+            {
+                var recetaAnterior = ConsultarReceta(cita.IdCita, null);
+
+                if (recetaAnterior != null)
+                    cita.Receta.IdReceta = recetaAnterior.IdReceta;
+            }
+
+            if (cita.Receta.IdReceta > 0)
+            {
+                var detallesRecetaAnteriores = ConsultarDetallesReceta(cita.Receta.IdReceta);
+
+                if (cita.Receta.Detalles.Exists(d => d.IdDetalleReceta == 0))
+                    detallesRecetaGuardar = cita.Receta.Detalles.FindAll(d => d.IdDetalleReceta == 0);
+
+                if (detallesRecetaAnteriores.Exists(a => !cita.Receta.Detalles.Exists(d => a.IdDetalleReceta == d.IdDetalleReceta)))
+                    detallesRecetaEliminar = detallesRecetaAnteriores.FindAll(a => !cita.Receta.Detalles.Exists(d => a.IdDetalleReceta == d.IdDetalleReceta));
+            }
+            else
+                detallesRecetaGuardar = cita.Receta.Detalles;
+
+            using (TransactionScope tran = new TransactionScope(TransactionScopeOption.Required))
+            {
+                GuardarDatosAdicionalesCita(cita);
+
+                int idReceta = GuardarReceta(cita.Receta, usuario);
+
+                foreach (var item in detallesRecetaGuardar)
+                {
+                    item.IdReceta = idReceta;
+
+                    GuardarDetalleReceta(item);
+                }
+
+                foreach (var item in detallesRecetaEliminar)
+                {
+                    EliminarDetalleReceta(item);
+                }
+
+                tran.Complete();
+            }
+        }
+
+        #endregion
+
+        #region Receta
+
+        public Receta ConsultarReceta(int? idCita, int? idReceta)
+        {
+            var objData = GetConnection();
+
+            Receta receta = null;
+
+            IDbDataParameter[] parameters = new IDbDataParameter[2]
+            {
+                objData.CreateParameter("@i_id_cita", SqlDbType.Int, 4),
+                objData.CreateParameter("@i_id_receta", SqlDbType.Int, 4)
+            };
+
+            if (idCita != null)
+                parameters[0].Value = idCita.GetValueOrDefault();
+            if (idReceta != null)
+                parameters[1].Value = idReceta.GetValueOrDefault();
+
+            var recetas = objData.ConsultarDatos<Receta>("ConsultarReceta", parameters);
+
+            if (recetas != null && recetas.Count() > 0)
+                receta = recetas.FirstOrDefault();
+
+            return receta;
+        }
+
+        public int GuardarReceta(Receta receta, Usuario usuario)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[5]
+            {
+                objData.CreateParameter("@i_id_receta", SqlDbType.Int, 4),
+                objData.CreateParameter("@i_id_cita", SqlDbType.Int, 4, receta.IdCita),
+                objData.CreateParameter("@i_observaciones", SqlDbType.VarChar, 300, receta.Observaciones),
+                objData.CreateParameter("@i_usuario", SqlDbType.Int, 4, usuario.IdUsuario),
+                objData.CreateParameter("@o_id_receta", SqlDbType.Int, 4, ParameterDirection.Output)
+            };
+
+            if (receta.IdReceta > 0)
+                parameters[0].Value = receta.IdReceta;
+
+            var idReceta = objData.Insert("GuardarReceta", CommandType.StoredProcedure, parameters);
+
+            return idReceta;
+        }
+
+        public List<DetalleReceta> ConsultarDetallesReceta(int idReceta)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[1]
+            {
+                objData.CreateParameter("@i_id_receta", SqlDbType.Int, 4, idReceta)
+            };
+
+            var detalles = objData.ConsultarDatos<DetalleReceta>("ConsultarDetallesReceta", parameters);
+
+            return detalles;
+        }
+
+        public void GuardarDetalleReceta(DetalleReceta detalle)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[3]
+            {
+                objData.CreateParameter("@i_id_receta", SqlDbType.Int, 4, detalle.IdReceta),
+                objData.CreateParameter("@i_id_medicamento", SqlDbType.Int, 4, detalle.IdMedicamento),
+                objData.CreateParameter("@i_indicaciones", SqlDbType.VarChar, 150)
+            };
+
+            if (!string.IsNullOrEmpty(detalle.Indicaciones))
+                parameters[2].Value = detalle.Indicaciones;
+
+            objData.Insert("GuardarDetalleReceta", CommandType.StoredProcedure, parameters);
+        }
+
+        public void EliminarDetalleReceta(DetalleReceta detalle)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[1]
+            {
+                objData.CreateParameter("@i_id_detalle_receta", SqlDbType.Int, 4, detalle.IdDetalleReceta),
+            };
+
+            objData.Delete("EliminarDetalleReceta", CommandType.StoredProcedure, parameters);
         }
 
         #endregion

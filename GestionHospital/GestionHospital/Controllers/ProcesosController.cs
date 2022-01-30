@@ -348,6 +348,9 @@ namespace GestionHospital.Controllers
                 vistaCitas.FechaActual = DateTime.Now;
                 vistaCitas.FechaConsulta = vistaCitas.FechaActual;
                 vistaCitas.ListaEstados = objAdministracion.ConsultarDetallesCatalogo(4);
+                vistaCitas.ListaMedicamentos = objAdministracion.ConsultarDetallesCatalogo(101);
+
+                vistaCitas.IdTemp = Guid.NewGuid().ToString();
 
                 var usuario = (Usuario)System.Web.HttpContext.Current.Session["Usuario"];
 
@@ -432,9 +435,140 @@ namespace GestionHospital.Controllers
                 if (citasPendientes == null)
                     citasPendientes = new List<CitaMedica>();
                 else
+                {
+                    citasPendientes.ForEach(c => { if (c.Receta == null) c.Receta = new Receta(); });
+
                     citasPendientes = citasPendientes.OrderBy(c => c.Fecha).OrderBy(c => c.IdHorario).ToList();
+                }
 
                 return Json(citasPendientes.ToDataSourceResult(request));
+            }
+            catch (Exception ex)
+            {
+                return RetornarErrorJsonResult(ex.Message);
+            }
+        }
+
+        public JsonResult ConsultarDetalleReceta([DataSourceRequest] DataSourceRequest request, int idReceta, string idTemp)
+        {
+            ProcesosCore objProcesos = new ProcesosCore();
+
+            try
+            {
+                List<DetalleReceta> detalles;
+
+                if (idReceta > 0)
+                {
+                    detalles = (List<DetalleReceta>)System.Web.HttpContext.Current.Session["DetallesReceta-" + idReceta.ToString()];
+
+                    if (detalles == null)
+                    {
+                        detalles = objProcesos.ConsultarDetallesReceta(idReceta);
+
+                        Session["DetallesReceta-" + idReceta.ToString()] = detalles;
+                    }
+                }
+                else
+                {
+                    detalles = (List<DetalleReceta>)System.Web.HttpContext.Current.Session["DetallesReceta-" + idTemp];
+
+                    if (detalles == null)
+                    {
+                        detalles = new List<DetalleReceta>();
+
+                        Session["DetallesReceta-" + idTemp] = detalles;
+                    }
+                }
+
+                return Json(detalles.OrderBy(t => t.IdDetalleReceta).ToDataSourceResult(request));
+            }
+            catch (Exception ex)
+            {
+                return RetornarErrorJsonResult(ex.Message);
+            }
+        }
+
+        public JsonResult ActualizarDetalleReceta(DetalleReceta detalle, int idReceta, string idTemp)
+        {
+            try
+            {
+                List<DetalleReceta> detallesReceta;
+
+                if (idReceta > 0)
+                    detallesReceta = (List<DetalleReceta>)System.Web.HttpContext.Current.Session["DetallesReceta-" + idReceta.ToString()];
+                else
+                    detallesReceta = (List<DetalleReceta>)System.Web.HttpContext.Current.Session["DetallesReceta-" + idTemp];
+
+                if (detallesReceta == null)
+                    detallesReceta = new List<DetalleReceta>();
+
+                var detalleAnterior = detallesReceta.FirstOrDefault(e => e.IdDetalleReceta == detalle.IdDetalleReceta);
+
+                detallesReceta.Remove(detalleAnterior);
+                detallesReceta.Add(detalle);
+
+                Session["DetallesReceta-" + idTemp] = detallesReceta;
+
+                return Json("OK");
+            }
+            catch (Exception ex)
+            {
+                return RetornarErrorJsonResult(ex.Message);
+            }
+        }
+
+        public JsonResult GuardarDetalleReceta(DetalleReceta detalles, int idReceta, string idTemp)
+        {
+            try
+            {
+                List<DetalleReceta> detallesReceta;
+
+                if (idReceta > 0)
+                    detallesReceta = (List<DetalleReceta>)System.Web.HttpContext.Current.Session["DetallesReceta-" + idReceta.ToString()];
+                else
+                    detallesReceta = (List<DetalleReceta>)System.Web.HttpContext.Current.Session["DetallesReceta-" + idTemp];
+
+                if (detallesReceta == null)
+                    detallesReceta = new List<DetalleReceta>();
+
+                if (detallesReceta.Count() > 0)
+                    detalles.IdDetalleReceta = detallesReceta.Min(e => e.IdDetalleReceta) < 0 ? detallesReceta.Min(e => e.IdDetalleReceta) - 1 : -1;
+                else
+                    detalles.IdDetalleReceta = -1;
+
+                detallesReceta.Add(detalles);
+
+                Session["DetallesReceta-" + idTemp] = detallesReceta;
+
+                return Json("OK");
+            }
+            catch (Exception ex)
+            {
+                return RetornarErrorJsonResult(ex.Message);
+            }
+        }
+
+        public JsonResult EliminarDetalleReceta(DetalleReceta detalle, int idReceta, string idTemp)
+        {
+            try
+            {
+                List<DetalleReceta> detallesReceta;
+
+                if (idReceta > 0)
+                    detallesReceta = (List<DetalleReceta>)System.Web.HttpContext.Current.Session["DetallesReceta-" + idReceta.ToString()];
+                else
+                    detallesReceta = (List<DetalleReceta>)System.Web.HttpContext.Current.Session["DetallesReceta-" + idTemp];
+
+                if (detallesReceta == null)
+                    detallesReceta = new List<DetalleReceta>();
+
+                var detalleEliminar = detallesReceta.FirstOrDefault(e => e.IdDetalleReceta == detalle.IdDetalleReceta);
+
+                detallesReceta.Remove(detalleEliminar);
+
+                Session["DetallesReceta-" + idTemp] = detallesReceta;
+
+                return Json("OK");
             }
             catch (Exception ex)
             {
@@ -445,45 +579,64 @@ namespace GestionHospital.Controllers
         public ActionResult GuardarDatosCita(GestionCitasView vistaCitas)
         {
             ViewBag.Title = "Gestión de citas";
-            
+
             AdministracionCore objAdministracion = new AdministracionCore();
             ProcesosCore objProcesos = new ProcesosCore();
 
             DateTime fechaActual = DateTime.Now;
 
             List<DetalleCatalogo> listaEstados = new List<DetalleCatalogo>();
+            List<DetalleCatalogo> listaMedicamentos = new List<DetalleCatalogo>();
 
             try
             {
+                var usuario = (Usuario)System.Web.HttpContext.Current.Session["Usuario"];
+
                 DateTime fechaConsulta = vistaCitas.FechaConsulta;
                 listaEstados = objAdministracion.ConsultarDetallesCatalogo(4);
+                listaMedicamentos = objAdministracion.ConsultarDetallesCatalogo(101);
 
                 if (ModelState.IsValid)
                 {
                     string identificacion = vistaCitas.IdentificacionMedico;
+                    
+                    List<DetalleReceta> detallesReceta;
+
+                    if (vistaCitas.Receta.IdReceta > 0)
+                        detallesReceta = (List<DetalleReceta>)System.Web.HttpContext.Current.Session["DetallesReceta-" + vistaCitas.Receta.IdReceta.ToString()];
+                    else
+                        detallesReceta = (List<DetalleReceta>)System.Web.HttpContext.Current.Session["DetallesReceta-" + vistaCitas.IdTemp];
+
+                    vistaCitas.Receta.IdCita = vistaCitas.IdCita;
+                    vistaCitas.Receta.Detalles = detallesReceta;
 
                     CitaMedica cita = new CitaMedica()
                     {
                         IdCita = vistaCitas.IdCita,
                         Diagnostico = vistaCitas.Diagnostico,
-                        Examenes = vistaCitas.Examenes,
                         Receta = vistaCitas.Receta,
                         IdEstado = vistaCitas.IdEstadoCita,
                         FechaProximoControl = vistaCitas.FechaProximoControl
                     };
 
-                    objProcesos.GuardarDatosAdicionalesCita(cita);
+                    objProcesos.GuardarResultadoCita(cita, usuario);
+
+                    string idTemp = vistaCitas.IdTemp;
 
                     vistaCitas = new GestionCitasView
                     {
                         IdentificacionMedico = identificacion,
-                        FechaConsulta = fechaConsulta
+                        FechaConsulta = fechaConsulta,
+                        IdTemp = idTemp
                     };
+
+                    Session["DetallesReceta-" + idTemp] = null;
+                    Session["DetallesReceta-" + cita.Receta.IdReceta.ToString()] = null;
 
                     ModelState.Clear();
                 }
 
-                ViewBag.Message = "Cita Guardad Correctamente";
+                ViewBag.Message = "Cita Guardada Correctamente";
             }
             catch (Exception ex)
             {
@@ -492,6 +645,7 @@ namespace GestionHospital.Controllers
 
             vistaCitas.FechaActual = fechaActual;
             vistaCitas.ListaEstados = listaEstados;
+            vistaCitas.ListaMedicamentos = listaMedicamentos;
 
             return View("_GestionCitas", vistaCitas);
         }

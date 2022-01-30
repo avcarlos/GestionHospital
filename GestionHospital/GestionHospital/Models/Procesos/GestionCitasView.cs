@@ -30,7 +30,7 @@ namespace GestionHospital.Models.Procesos
 
         public string Examenes { get; set; }
 
-        public string Receta { get; set; }
+        public Receta Receta { get; set; }
 
         public int IdEstadoCita { get; set; }
 
@@ -41,6 +41,10 @@ namespace GestionHospital.Models.Procesos
         public DateTime FechaActual { get; set; }
 
         public List<DetalleCatalogo> ListaEstados { get; set; }
+
+        public List<DetalleCatalogo> ListaMedicamentos { get; set; }
+
+        public string IdTemp { get; set; }
 
         public GestionCitasView()
         {

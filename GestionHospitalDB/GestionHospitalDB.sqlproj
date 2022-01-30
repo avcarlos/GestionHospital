@@ -109,6 +109,13 @@
     <Build Include="dbo\Procedimientos Almacenados\ConsultarTransacciones.sql" />
     <Build Include="dbo\Procedimientos Almacenados\ActualizarTransaccion.sql" />
     <Build Include="dbo\Procedimientos Almacenados\EliminarTransaccion.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\GuardarRolSeguridad.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\EliminarRolSeguridad.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarRolesSeguridad.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ActualizarRolSeguridad.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarTransaccionesRolSeguridad.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\EliminarTransaccionRolSeguridad.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\GuardarTransaccionRolSeguridad.sql" />
   </ItemGroup>
   <ItemGroup>
     <PreDeploy Include="Scripts\PreDeployment\Script.PreDeployment.sql" />

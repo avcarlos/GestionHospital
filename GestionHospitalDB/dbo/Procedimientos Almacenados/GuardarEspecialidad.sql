@@ -8,6 +8,7 @@ INSERT INTO Especialidad
 (
 	Nombre,
 	Descripcion,
+	Estado,
 	IdUsuarioRegistro,
 	FechaRegistro
 )
@@ -15,6 +16,7 @@ VALUES
 (
 	@i_nombre,
 	@i_descripcion,
+	1,
 	@i_id_usuario_registro,
 	GETDATE()
 )

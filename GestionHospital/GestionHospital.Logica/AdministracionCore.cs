@@ -370,6 +370,14 @@ namespace GestionHospital.Logica
 
         public void ActualizarMedico(Medico medico)
         {
+            if (medico.Especialidades == null)
+                medico.Especialidades = new List<Especialidad>();
+
+            var especialidadesIniciales = ConsultarEspecialidadesMedico(medico.IdPersona);
+
+            var especialidadesGuardar = medico.Especialidades.FindAll(e => !especialidadesIniciales.Exists(i => i.IdEspecialidad == e.IdEspecialidad));
+            var especialidadesEliminar = especialidadesIniciales.FindAll(i => !medico.Especialidades.Exists(e => e.IdEspecialidad == i.IdEspecialidad));
+
             using (TransactionScope tran = new TransactionScope(TransactionScopeOption.Required))
             {
                 ActualizarPersona(medico);
@@ -380,20 +388,18 @@ namespace GestionHospital.Logica
                 if (!tipoMedico.Estado && medico.EstadoTipo)
                     GuardarTipoPersona(new TipoPersona() { IdPersona = medico.IdPersona, IdTipo = 5 });
 
-                if (medico.Especialidades != null && medico.Especialidades.Count() > 0)
+                if (especialidadesGuardar != null && especialidadesGuardar.Count() > 0)
                 {
-                    var especialidadesIniciales = ConsultarEspecialidadesMedico(medico.IdPersona);
-
-                    var especialidadesGuardar = medico.Especialidades.FindAll(e => !especialidadesIniciales.Exists(i => i.IdEspecialidad == e.IdEspecialidad));
-                    var especialidadesEliminar = especialidadesIniciales.FindAll(i => !medico.Especialidades.Exists(e => e.IdEspecialidad == i.IdEspecialidad));
-
                     foreach (var item in especialidadesGuardar)
                     {
                         item.IdMedico = medico.IdPersona;
 
                         GuardarEspecialidadMedico(item);
                     }
+                }
 
+                if (especialidadesEliminar != null && especialidadesEliminar.Count() > 0)
+                {
                     foreach (var item in especialidadesEliminar)
                     {
                         item.IdMedico = medico.IdPersona;
@@ -555,7 +561,7 @@ namespace GestionHospital.Logica
 
             var especialidades = objData.ConsultarDatos<Especialidad>("ConsultarEspecialidades");
 
-            if(!incluirInactivas)
+            if (!incluirInactivas)
                 especialidades = especialidades.FindAll(e => e.Estado);
 
             return especialidades;
@@ -600,11 +606,12 @@ namespace GestionHospital.Logica
             {
                 var objData = GetConnection();
 
-                IDbDataParameter[] parameters = new IDbDataParameter[4]
+                IDbDataParameter[] parameters = new IDbDataParameter[5]
                 {
                     objData.CreateParameter("@i_id_especialidad", SqlDbType.Int, 4, especialidad.IdEspecialidad),
                     objData.CreateParameter("@i_nombre", SqlDbType.VarChar, 30, especialidad.Nombre),
                     objData.CreateParameter("@i_descripcion", SqlDbType.VarChar, 300, especialidad.Descripcion),
+                    objData.CreateParameter("@i_estado", SqlDbType.Bit, 1, especialidad.Estado),
                     objData.CreateParameter("@i_id_usuario_modificacion", SqlDbType.Int, 4, especialidad.IdUsuarioModificacion)
                 };
 

@@ -11,5 +11,7 @@
         public bool Estado { get; set; }
 
         public string Menu { get; set; }
+
+        public int IdTransaccionRolSeguridad { get; set; }
     }
 }

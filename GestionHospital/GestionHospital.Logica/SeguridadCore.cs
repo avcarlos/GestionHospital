@@ -6,6 +6,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace GestionHospital.Logica
 {
@@ -92,7 +93,7 @@ namespace GestionHospital.Logica
                 parameters[2].Value = usuario.IdPersona.GetValueOrDefault();
 
             int idUsuario = objData.Insert("GuardarUsuario", CommandType.StoredProcedure, parameters);
-            
+
             return idUsuario;
         }
 
@@ -117,8 +118,8 @@ namespace GestionHospital.Logica
             string nuevoPassword = Guid.NewGuid().ToString();
 
             nuevoPassword = char.ToUpper(usuario.LoginUsuario[0]) +
-                            usuario.LoginUsuario.Substring(1, 3) + 
-                            nuevoPassword.Substring(0, 3) + 
+                            usuario.LoginUsuario.Substring(1, 3) +
+                            nuevoPassword.Substring(0, 3) +
                             "." + usuario.IdUsuario.ToString();
 
             return nuevoPassword;
@@ -138,7 +139,7 @@ namespace GestionHospital.Logica
 
         #endregion
 
-        #region Transaccion
+        #region Transacciones
 
         public List<Transaccion> ConsultarTransacciones(bool incluirInactivas = false)
         {
@@ -181,6 +182,159 @@ namespace GestionHospital.Logica
             };
 
             objData.Delete("EliminarTransaccion", CommandType.StoredProcedure, parameters);
+        }
+
+        #endregion
+
+        #region Roles de Seguridad
+
+        public List<RolSeguridad> ConsultarRolesSeguridad(bool incluirInactivas = false)
+        {
+            var objData = GetConnection();
+
+            var roles = objData.ConsultarDatos<RolSeguridad>("ConsultarRolesSeguridad");
+
+            if (!incluirInactivas)
+                roles = roles.FindAll(e => e.Estado);
+
+            return roles;
+        }
+
+        public int GuardarRolSeguridad(RolSeguridad rol, Usuario usuario)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[4]
+            {
+                objData.CreateParameter("@i_nombre", SqlDbType.VarChar, 30, rol.Nombre),
+                objData.CreateParameter("@i_descripcion", SqlDbType.VarChar, 300, rol.Descripcion),
+                objData.CreateParameter("@i_id_usuario", SqlDbType.Int, 4, usuario.IdUsuario),
+                objData.CreateParameter("@o_id_rol_seguridad", SqlDbType.Int, 4, ParameterDirection.Output)
+            };
+
+            var idRol = objData.Insert("GuardarRolSeguridad", CommandType.StoredProcedure, parameters);
+
+            return idRol;
+        }
+
+        public void GuardarRol(RolSeguridad rol, Usuario usuario)
+        {
+            using (TransactionScope tran = new TransactionScope(TransactionScopeOption.Required))
+            {
+                var idRol = GuardarRolSeguridad(rol, usuario);
+
+                if (rol.Transacciones != null && rol.Transacciones.Count() > 0)
+                {
+                    foreach (var item in rol.Transacciones)
+                    {
+                        GuardarTransaccionRolSeguridad(idRol, item.IdTransaccion);
+                    }
+                }
+
+                tran.Complete();
+            }
+        }
+
+        public void ActualizarRolSeguridad(RolSeguridad rolSeguridad, Usuario usuario)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[5]
+            {
+                objData.CreateParameter("@i_id_rol_seguridad", SqlDbType.Int, 4, rolSeguridad.IdRolSeguridad),
+                objData.CreateParameter("@i_nombre", SqlDbType.VarChar, 30, rolSeguridad.Nombre),
+                objData.CreateParameter("@i_descripcion", SqlDbType.VarChar, 300, rolSeguridad.Descripcion),
+                objData.CreateParameter("@i_estado", SqlDbType.Bit, 1, rolSeguridad.Estado),
+                objData.CreateParameter("@i_id_usuario", SqlDbType.Int, 4, usuario.IdUsuario)
+            };
+
+            objData.Update("ActualizarRolSeguridad", CommandType.StoredProcedure, parameters);
+        }
+
+        public void ActualizarRol(RolSeguridad rol, Usuario usuario)
+        {
+            if (rol.Transacciones == null)
+                rol.Transacciones = new List<Transaccion>();
+
+            var transaccionesIniciales = ConsultarTransaccionesRolSeguridad(rol.IdRolSeguridad);
+
+            var transaccionesGuardar = rol.Transacciones.FindAll(e => !transaccionesIniciales.Exists(i => i.IdTransaccion == e.IdTransaccion));
+            var transaccionesEliminar = transaccionesIniciales.FindAll(i => !rol.Transacciones.Exists(e => e.IdTransaccion == i.IdTransaccion));
+
+            using (TransactionScope tran = new TransactionScope(TransactionScopeOption.Required))
+            {
+                ActualizarRolSeguridad(rol, usuario);
+
+                if (transaccionesGuardar != null && transaccionesGuardar.Count() > 0)
+                {
+                    foreach (var item in transaccionesGuardar)
+                    {
+                        GuardarTransaccionRolSeguridad(rol.IdRolSeguridad, item.IdTransaccion);
+                    }
+                }
+
+                if (transaccionesEliminar != null && transaccionesEliminar.Count() > 0)
+                {
+                    foreach (var item in transaccionesEliminar)
+                    {
+                        EliminarTransaccionRolSeguridad(item.IdTransaccionRolSeguridad);
+                    }
+                }
+
+                tran.Complete();
+            }
+        }
+
+        public void EliminarRolSeguridad(RolSeguridad rolSeguridad, Usuario usuario)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[2]
+            {
+                objData.CreateParameter("@i_id_rol_seguridad", SqlDbType.Int, 4, rolSeguridad.IdRolSeguridad),
+                objData.CreateParameter("@i_id_usuario", SqlDbType.Int, 4, usuario.IdUsuario)
+            };
+
+            objData.Delete("EliminarRolSeguridad", CommandType.StoredProcedure, parameters);
+        }
+
+        public List<Transaccion> ConsultarTransaccionesRolSeguridad(int idRolSeguridad)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[1]
+            {
+                objData.CreateParameter("@i_id_rol_seguridad", SqlDbType.Int, 4, idRolSeguridad)
+            };
+
+            var transacciones = objData.ConsultarDatos<Transaccion>("ConsultarTransaccionesRolSeguridad", parameters);
+
+            return transacciones;
+        }
+
+        public void GuardarTransaccionRolSeguridad(int idRolSeguridad, int idTransaccion)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[2]
+            {
+                objData.CreateParameter("@i_id_rol_seguridad", SqlDbType.Int, 4, idRolSeguridad),
+                objData.CreateParameter("@i_id_transaccion", SqlDbType.Int, 4, idTransaccion)
+            };
+
+            objData.Insert("GuardarTransaccionRolSeguridad", CommandType.StoredProcedure, parameters);
+        }
+
+        public void EliminarTransaccionRolSeguridad(int idTransaccionRolSeguridad)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[1]
+            {
+                objData.CreateParameter("@i_id_transaccion_rol_seguridad", SqlDbType.Int, 4, idTransaccionRolSeguridad)
+            };
+
+            objData.Delete("EliminarTransaccionRolSeguridad", CommandType.StoredProcedure, parameters);
         }
 
         #endregion

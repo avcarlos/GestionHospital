@@ -49,6 +49,7 @@
     <Compile Include="Paciente.cs" />
     <Compile Include="Persona.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RolSeguridad.cs" />
     <Compile Include="TipoPersona.cs" />
     <Compile Include="Transaccion.cs" />
     <Compile Include="TransaccionMenu.cs" />

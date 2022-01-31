@@ -127,6 +127,10 @@
     <Build Include="dbo\Procedimientos Almacenados\ActualizarDetalleCatalogo.sql" />
     <Build Include="dbo\Procedimientos Almacenados\GuardarDetalleCatalogo.sql" />
     <Build Include="dbo\Procedimientos Almacenados\EliminarDetalleCatalogo.sql" />
+    <Build Include="dbo\Tablas\ExamenesCita.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\EliminarExamenCita.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ConsultarExamenesCita.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\GuardarExamenCita.sql" />
   </ItemGroup>
   <ItemGroup>
     <PreDeploy Include="Scripts\PreDeployment\Script.PreDeployment.sql" />

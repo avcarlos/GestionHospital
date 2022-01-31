@@ -28,8 +28,6 @@ namespace GestionHospital.Models.Procesos
 
         public string Diagnostico { get; set; }
 
-        public string Examenes { get; set; }
-
         public Receta Receta { get; set; }
 
         public int IdEstadoCita { get; set; }
@@ -43,6 +41,8 @@ namespace GestionHospital.Models.Procesos
         public List<DetalleCatalogo> ListaEstados { get; set; }
 
         public List<DetalleCatalogo> ListaMedicamentos { get; set; }
+
+        public List<DetalleCatalogo> ListaExamenes { get; set; }
 
         public string IdTemp { get; set; }
 

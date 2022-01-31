@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GestionHospital.Model.Shared
 {
@@ -40,9 +41,12 @@ namespace GestionHospital.Model.Shared
 
         public Receta Receta { get; set; }
 
+        public List<ExamenMedico> Examenes { get; set; }
+
         public CitaMedica()
         {
             Receta = new Receta();
+            Examenes = new List<ExamenMedico>();
         }
     }
 }

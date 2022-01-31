@@ -102,6 +102,7 @@ IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 4) INSERT INTO dbo.
 IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 5) INSERT INTO dbo.Catalogo (IdCatalogo, Nombre, Estado) VALUES (5, 'Ciudad', 1)
 IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 6) INSERT INTO dbo.Catalogo (IdCatalogo, Nombre, Estado) VALUES (6, 'Tipo Horario', 1)
 IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 101) INSERT INTO dbo.Catalogo (IdCatalogo, Nombre, Estado, Administrable) VALUES (101, 'Medicamentos', 1, 1)
+IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 102) INSERT INTO dbo.Catalogo (IdCatalogo, Nombre, Estado) VALUES (102, 'Exámenes Médicos', 1)
 
 SET IDENTITY_INSERT dbo.Catalogo OFF
 
@@ -139,6 +140,10 @@ IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 102) 
 -- Medicamentos
 IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 1001) INSERT INTO dbo.DetalleCatalogo (IdDetalleCatalogo, IdCatalogo, Nombre, Codigo, Estado) VALUES (1001, 101, 'Medicamento 1', 'ME1', 1)
 IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 1002) INSERT INTO dbo.DetalleCatalogo (IdDetalleCatalogo, IdCatalogo, Nombre, Codigo, Estado) VALUES (1002, 101, 'Medicamento 2', 'ME2', 1)
+
+-- Exámenes Médicos
+IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 1003) INSERT INTO dbo.DetalleCatalogo (IdDetalleCatalogo, IdCatalogo, Nombre, Codigo, Estado) VALUES (1003, 102, 'Exámen 1', 'EX1', 1)
+IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 1004) INSERT INTO dbo.DetalleCatalogo (IdDetalleCatalogo, IdCatalogo, Nombre, Codigo, Estado) VALUES (1004, 102, 'Exámen 2', 'EX2', 1)
 
 SET IDENTITY_INSERT dbo.DetalleCatalogo OFF
 

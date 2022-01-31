@@ -46,6 +46,7 @@
     <Compile Include="DetalleCatalogo.cs" />
     <Compile Include="DetalleReceta.cs" />
     <Compile Include="Especialidad.cs" />
+    <Compile Include="ExamenMedico.cs" />
     <Compile Include="Horario.cs" />
     <Compile Include="Medico.cs" />
     <Compile Include="Paciente.cs" />

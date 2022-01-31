@@ -98,6 +98,7 @@
                     $('#FechaProximoControl').data('kendoDatePicker').value(selectedRow.FechaProximoControl);
 
                     refrescarGridReceta();
+                    refrescarGridExamenes();
                 }
 
                 function mostrarErrorGrid(e) {
@@ -119,6 +120,18 @@
                     var idTempParam = $('#IdTemp').val();
 
                     return { idReceta: idRecetaParam, idTemp: idTempParam };
+                }
+
+                function refrescarGridExamenes() {
+                    var idCitaParam = $('#IdCita').val();
+
+                    $('#GridExamenes').data('kendoGrid').dataSource.read({ idCita: idCitaParam });
+                }
+
+                function parametrosGridExamenes() {
+                    var idCitaParam = $('#IdCita').val();
+
+                    return { idCita: idCitaParam };
                 }
             </script>
             @using (Html.BeginForm())
@@ -239,8 +252,39 @@
                         <td>
                             Exámenes:
                         </td>
-                        <td colspan="2">
-                            @Html.TextAreaFor(m => m.Examenes, 3, 500, new { style = "width: 80%; max-width: 100%", @class = "form-control" })
+                        <td colspan="3">
+                            @(
+                                Html.Kendo()
+                                    .Grid<GestionHospital.Model.Shared.ExamenMedico>()
+                                    .Name("GridExamenes")
+                                    .Columns(c =>
+                                    {
+                                        c.Bound(col => col.IdExamenCita).Hidden(true);
+                                        c.ForeignKey(h => h.IdExamen, Model.ListaExamenes, "IdDetalleCatalogo", "Nombre").Title("Examen").HeaderHtmlAttributes(new { style = "text-align:center" });
+                                        c.Bound(col => col.Indicaciones).Title("Indicaciones").Width(200).HeaderHtmlAttributes(new { style = "text-align:center" });
+                                        c.Command(command =>
+                                        {
+                                            command.Edit().Text("Editar").UpdateText("Guardar").CancelText("Cancelar");
+                                            command.Destroy().Text("Eliminar");
+                                        }).Width(250);
+                                    })
+                                    .DataSource(dataBinding => dataBinding.Ajax()
+                                        .Events(events => events.Error("mostrarErrorGrid").Sync("refrescarGridExamenes"))
+                                        .Model(model =>
+                                        {
+                                            model.Id(m => m.IdExamenCita);
+                                        })
+                                            .Read(read => read.Action("ConsultarExamenesCita", "Procesos").Data("parametrosGridExamenes"))
+                                            .Update(update => update.Action("ActualizarExamenCita", "Procesos").Data("parametrosGridExamenes"))
+                                            .Create(create => create.Action("GuardarExamenCita", "Procesos").Data("parametrosGridExamenes"))
+                                            .Destroy(destroy => destroy.Action("EliminarExamenCita", "Procesos").Data("parametrosGridExamenes"))
+                                        )
+                                    .ToolBar(toolBar => toolBar.Create().Text("Nuevo"))
+                                    .Editable(editable => editable.Mode(Kendo.Mvc.UI.GridEditMode.InLine).ConfirmDelete("Eliminar exámen").DisplayDeleteConfirmation("Seguro desea eliminar el exámen?"))
+                                    .Scrollable(s => s.Height("auto"))
+                                    .Resizable(r => r.Columns(true))
+                                    .AutoBind(false)
+                            )
                         </td>
                     </tr>
                     <tr class="datosCita" style="display:none">

@@ -208,6 +208,8 @@ namespace GestionHospital.Logica
         {
             List<DetalleReceta> detallesRecetaGuardar = new List<DetalleReceta>();
             List<DetalleReceta> detallesRecetaEliminar = new List<DetalleReceta>();
+            List<ExamenMedico> examenesGuardar = new List<ExamenMedico>();
+            List<ExamenMedico> examenesEliminar = new List<ExamenMedico>();
 
             if (cita.Receta.IdReceta == 0)
             {
@@ -230,23 +232,50 @@ namespace GestionHospital.Logica
             else
                 detallesRecetaGuardar = cita.Receta.Detalles;
 
+            var examenesAnteriores = ConsultarExamenesCita(cita.IdCita);
+
+            if (examenesAnteriores != null && examenesAnteriores.Count() > 0)
+            {
+                if (cita.Examenes.Exists(d => d.IdExamenCita == 0))
+                    examenesGuardar = cita.Examenes.FindAll(d => d.IdExamenCita == 0);
+
+                if (examenesAnteriores.Exists(a => !cita.Examenes.Exists(d => a.IdExamenCita == d.IdExamenCita)))
+                    examenesEliminar = examenesAnteriores.FindAll(a => !cita.Examenes.Exists(d => a.IdExamenCita == d.IdExamenCita));
+            }
+            else
+                examenesGuardar = cita.Examenes;
+
             using (TransactionScope tran = new TransactionScope(TransactionScopeOption.Required))
             {
                 GuardarDatosAdicionalesCita(cita);
 
                 int idReceta = GuardarReceta(cita.Receta, usuario);
 
-                foreach (var item in detallesRecetaGuardar)
-                {
-                    item.IdReceta = idReceta;
+                if (detallesRecetaGuardar != null)
+                    foreach (var item in detallesRecetaGuardar)
+                    {
+                        item.IdReceta = idReceta;
 
-                    GuardarDetalleReceta(item);
-                }
+                        GuardarDetalleReceta(item);
+                    }
 
-                foreach (var item in detallesRecetaEliminar)
-                {
-                    EliminarDetalleReceta(item);
-                }
+                if (detallesRecetaEliminar != null)
+                    foreach (var item in detallesRecetaEliminar)
+                    {
+                        EliminarDetalleReceta(item);
+                    }
+
+                if(examenesGuardar != null)
+                    foreach (var item in examenesGuardar)
+                    {
+                        GuardarExamenCita(item);
+                    }
+
+                if (examenesEliminar != null)
+                    foreach (var item in examenesEliminar)
+                    {
+                        EliminarExamenCita(item);
+                    }
 
                 tran.Complete();
             }
@@ -343,6 +372,53 @@ namespace GestionHospital.Logica
             };
 
             objData.Delete("EliminarDetalleReceta", CommandType.StoredProcedure, parameters);
+        }
+
+        #endregion
+
+        #region Exámenes
+
+        public List<ExamenMedico> ConsultarExamenesCita(int idCita)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[1]
+            {
+                objData.CreateParameter("@i_id_cita", SqlDbType.Int, 4, idCita)
+            };
+
+            var examenes = objData.ConsultarDatos<ExamenMedico>("ConsultarExamenesCita", parameters);
+
+            return examenes;
+        }
+
+        public void GuardarExamenCita(ExamenMedico examen)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[3]
+            {
+                objData.CreateParameter("@i_id_cita", SqlDbType.Int, 4, examen.IdCita),
+                objData.CreateParameter("@i_id_examen", SqlDbType.Int, 4, examen.IdExamen),
+                objData.CreateParameter("@i_indicaciones", SqlDbType.VarChar, 150)
+            };
+
+            if (!string.IsNullOrEmpty(examen.Indicaciones))
+                parameters[2].Value = examen.Indicaciones;
+
+            objData.Insert("GuardarExamenCita", CommandType.StoredProcedure, parameters);
+        }
+
+        public void EliminarExamenCita(ExamenMedico examen)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[1]
+            {
+                objData.CreateParameter("@i_id_examen_cita", SqlDbType.Int, 4, examen.IdExamenCita),
+            };
+
+            objData.Delete("EliminarExamenCita", CommandType.StoredProcedure, parameters);
         }
 
         #endregion

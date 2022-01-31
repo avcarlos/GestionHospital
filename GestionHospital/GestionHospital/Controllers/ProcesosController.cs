@@ -765,6 +765,151 @@ namespace GestionHospital.Controllers
 
         #endregion
 
+        #region Recetas
+
+        [AuthorizeUser(idOperacion: 112)]
+        public ActionResult Recetas()
+        {
+            ViewBag.Title = "Gestión de recetas";
+
+            AdministracionCore objAdministracion = new AdministracionCore();
+
+            RecetasView vistaRecetas = new RecetasView();
+
+            try
+            {
+                var usuario = (Usuario)System.Web.HttpContext.Current.Session["Usuario"];
+
+                if (usuario.IdRolSeguridad == 2)    // Paciente
+                {
+                    vistaRecetas.EsPaciente = true;
+
+                    if (usuario.IdPersona.GetValueOrDefault() > 0)
+                    {
+                        var persona = objAdministracion.ConsultarPersonaId(usuario.IdPersona.GetValueOrDefault());
+                        var paciente = objAdministracion.ConsultarPaciente(persona.IdTipoIdentificacion, persona.Identificacion);
+
+                        if (paciente != null && paciente.EstadoTipo)
+                        {
+                            vistaRecetas.IdPersona = paciente.IdPersona;
+                            vistaRecetas.Identificacion = paciente.Identificacion;
+                            vistaRecetas.NombrePaciente = paciente.Nombres + " " + paciente.Apellidos;
+                        }
+                        else
+                            throw new Exception("Paciente se encuentra inactivo. Acerquese al hospital.");
+                    }
+                    else
+                        throw new Exception("Usuario no asignado. Acerquese al hospital.");
+                }
+            }
+            catch (Exception ex)
+            {
+                ViewBag.MessageError = ex.Message;
+            }
+
+            return View("_Recetas", vistaRecetas);
+        }
+
+        public JsonResult ConsultarRecetasPaciente(string identificacion)
+        {
+            AdministracionCore objAdministracion = new AdministracionCore();
+
+            try
+            {
+                Paciente paciente = null;
+
+                var tiposIdentificaciones = objAdministracion.ConsultarDetallesCatalogo(3);
+
+                if (tiposIdentificaciones != null)
+                    tiposIdentificaciones = tiposIdentificaciones.FindAll(t => t.Parametro1.GetValueOrDefault() == 1);
+
+                foreach (var item in tiposIdentificaciones)
+                {
+                    paciente = objAdministracion.ConsultarPaciente(item.IdDetalleCatalogo, identificacion);
+
+                    if (paciente != null)
+                        break;
+                }
+
+                if (paciente != null)
+                {
+                    var data = new
+                    {
+                        idPersona = paciente.IdPersona,
+                        nombrePaciente = paciente.Nombres + " " + paciente.Apellidos
+                    };
+
+                    return Json(data);
+                }
+
+                return Json("");
+            }
+            catch (Exception ex)
+            {
+                return RetornarErrorJsonResult(ex.Message);
+            }
+        }
+
+        public JsonResult CargarRecetasPaciente([DataSourceRequest] DataSourceRequest request, int idPaciente)
+        {
+            ProcesosCore objProcesos = new ProcesosCore();
+
+            try
+            {
+                List<Receta> recetas = null;
+
+                if (idPaciente > 0)
+                {
+                    recetas = objProcesos.ConsultarRecetasPaciente(idPaciente, null);
+
+                    if (recetas != null)
+                    {
+                        recetas = recetas.OrderByDescending(r => r.Fecha).ToList();
+                    }
+                }
+
+                if (recetas == null)
+                    recetas = new List<Receta>();
+
+                return Json(recetas.ToDataSourceResult(request));
+            }
+            catch (Exception ex)
+            {
+                return RetornarErrorJsonResult(ex.Message);
+            }
+        }
+
+        public JsonResult CargarDetallesRecetaPaciente([DataSourceRequest] DataSourceRequest request, int idReceta)
+        {
+            ProcesosCore objProcesos = new ProcesosCore();
+
+            try
+            {
+                List<DetalleReceta> detalles = null;
+
+                if (idReceta > 0)
+                {
+                    detalles = objProcesos.ConsultarDetallesReceta(idReceta);
+
+                    if (detalles != null)
+                    {
+                        detalles = detalles.OrderBy(d => d.IdDetalleReceta).ToList();
+                    }
+                }
+
+                if (detalles == null)
+                    detalles = new List<DetalleReceta>();
+
+                return Json(detalles.ToDataSourceResult(request));
+            }
+            catch (Exception ex)
+            {
+                return RetornarErrorJsonResult(ex.Message);
+            }
+        }
+
+        #endregion
+
         #region Comunes
 
         private JsonResult RetornarErrorJsonResult(string mensajeError)

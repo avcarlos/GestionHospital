@@ -1,0 +1,243 @@
+﻿@using GestionHospital.Models.Procesos
+@model RecetasView
+@{
+    var identificacion = ViewData.TemplateInfo.GetFullHtmlFieldId("Identificacion");
+}
+<h2>@ViewBag.Title.</h2>
+<h4 id="mensajeError" class="text-danger" style="display:@(string.IsNullOrEmpty(ViewBag.MessageError) ? "none" : string.Empty)">@ViewBag.MessageError.</h4>
+<h4 id="mensajeExito" class="text-info" style="display:@(string.IsNullOrEmpty(ViewBag.Message) ? "none" : string.Empty)">@ViewBag.Message.</h4>
+<div class="row">
+    <div class="col-md-11">
+        <section id="recetasForm">
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $('#limpiar').click(function () {
+                        $('form').attr('Action', '/Procesos/Recetas');
+                    });
+
+                    $('#@identificacion').change(
+                        function (event) {
+                            var identificacionParam = $('#@identificacion').val();
+
+                            $('#mensajeError').hide();
+                            $('#mensajeExito').hide();
+                            $('.datosReceta').hide();
+
+                            $('#IdReceta').val(0);
+                            $('#IdPersona').val(0);
+                            $('#NombrePaciente').val('');
+                            $('#NombreMedico').val('');
+                            $('#ObservacionesReceta').val();
+
+                            cargarGridRecetas();
+
+                            if (identificacionParam == "")
+                                return;
+
+                            mostrarVentanaCargando();
+
+                            $.ajax({
+                                type: "POST",
+                                url: '@Url.Action("ConsultarRecetasPaciente", "Procesos")',
+                                data: { identificacion: identificacionParam },
+                                success: function (result) {
+                                    if (result != "") {
+                                        $('#IdPersona').val(result.idPersona);
+                                        $('#NombrePaciente').val(result.nombrePaciente);
+
+                                        cargarGridRecetas();
+                                    } else {
+                                        alert('No existe el paciente ingresado');
+                                    }
+                                },
+                                error: function (err) {
+                                    alert('Error al consultar paciente: ' + err.responseJSON);
+                                },
+                                complete: function () {
+                                    cerrarVentanaCargando();
+                                }
+                            });
+                        }
+                    );
+                })
+
+                function cargarGridRecetas() {
+                    var idPersonaParam = $('#IdPersona').val();
+
+                    $('#GridRecetas').data('kendoGrid').dataSource.read({ idPaciente: idPersonaParam });
+                }
+
+                function onRowSelectedReceta() {
+	                var selectedRow;
+	                var grid = this;
+
+	                grid.select().each(function () {
+		                selectedRow = grid.dataItem($(this));
+                    });
+
+                    $('.datosReceta').show();
+
+                    $('#IdReceta').val(selectedRow.IdReceta);
+                    $('#NombreMedico').val(selectedRow.NombreMedico);
+                    $('#FechaEmision').data('kendoDatePicker').value(selectedRow.Fecha);
+                    $('#LoginUsuario').val(selectedRow.LoginUsuario);
+                    $('#FechaGeneracion').data('kendoDatePicker').value(selectedRow.FechaModificacion);
+                    $('#ObservacionesReceta').val(selectedRow.Observaciones);
+
+                    cargarGridDetallesReceta();
+                }
+
+                function cargarGridDetallesReceta() {
+                    var idRecetaParam = $('#IdReceta').val();
+
+                    $('#GridDetallesReceta').data('kendoGrid').dataSource.read({ idReceta: idRecetaParam });
+                }
+            </script>
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <table style="width: 80%">
+                    <tr>
+                        <td style="width:20%">
+                            Identificación:
+                        </td>
+                        <td>
+                            @if (Model.EsPaciente)
+                            {
+                                @Html.TextBoxFor(m => m.Identificacion, new { @readonly = "readonly", @class = "form-control" })
+                            }
+                            else
+                            {
+                                @Html.TextBoxFor(m => m.Identificacion, new { @class = "form-control" })
+                            }
+                            @Html.ValidationMessageFor(m => m.Identificacion, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Paciente:
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.NombrePaciente, new { @readonly = "readonly", @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.NombrePaciente, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Recetas:
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            @(
+                                Html.Kendo()
+                                .Grid<GestionHospital.Model.Shared.Receta>()
+                                .Name("GridRecetas")
+                                .Columns(c =>
+                                {
+                                    c.Bound(col => col.IdCita).Hidden();
+                                    c.Bound(col => col.IdReceta).Hidden();
+                                    c.Bound(col => col.NombreEspecialidad).Title("Especialidad");
+                                    c.Bound(col => col.NombreMedico).Title("Médico");
+                                    c.Bound(col => col.Fecha).Title("Fecha").Format("{0:dd/MM/yyyy}");
+                                })
+                                .Selectable()
+                                .DataSource(dataBinding => dataBinding.Ajax()
+                                    .Read("CargarRecetasPaciente", "Procesos", new { idPaciente = Model.IdPersona}))
+                                .Events(events => events.Change("onRowSelectedReceta"))
+                                .AutoBind(false)
+                            )
+                        </td>
+                    </tr>
+                    <tr class="datosReceta" style="display:none">
+                        <td colspan="2">
+                            <img src="@Url.Content("~/Content/images/LogoHospital.jpg")" width="100">
+                        </td>
+                    </tr>
+                    <tr class="datosReceta" style="display:none">
+                        <td colspan="2">
+                            HOSPITAL BÁSICO N° 1 EL ORO
+                        </td>
+                    </tr>
+                    <tr class="datosReceta" style="display:none">
+                        <td>
+                            Médico
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.NombreMedico, new { @readonly = "readonly", @class = "form-control" })
+                        </td>
+                    </tr>
+                    <tr class="datosReceta" style="display:none">
+                        <td>
+                            Fecha:
+                        </td>
+                        <td>
+                            @Html.Kendo().DatePickerFor(model => model.FechaEmision).Enable(false)
+                        </td>
+                    </tr>
+                    <tr class="datosReceta" style="display:none">
+                        <td>
+                            Medicamentos:
+                        </td>
+                    </tr>
+                    <tr class="datosReceta" style="display:none">
+                        <td colspan="2">
+                            @(
+                                Html.Kendo()
+                                .Grid<GestionHospital.Model.Shared.DetalleReceta>()
+                                .Name("GridDetallesReceta")
+                                .Columns(c =>
+                                {
+                                    c.Bound(col => col.Medicamento);
+                                    c.Bound(col => col.Indicaciones);
+                                })
+                                .DataSource(dataBinding => dataBinding.Ajax()
+                                    .Read("CargarDetallesRecetaPaciente", "Procesos", new { idReceta = Model.IdReceta }))
+                                .AutoBind(false)
+                            )
+                        </td>
+                    </tr>
+                    <tr class="datosReceta" style="display:none">
+                        <td>
+                            Observaciones:
+                        </td>
+                    </tr>
+                    <tr class="datosReceta" style="display:none">
+                        <td colspan="2">
+                            @Html.TextAreaFor(m => m.ObservacionesReceta, 3, 500, new { style = "width: 80%; max-width: 100%", @class = "form-control" })
+                        </td>
+                    </tr>
+                    <tr class="datosReceta" style="display:none">
+                        <td colspan="2">
+                            Generado por: @Html.TextBoxFor(model => model.LoginUsuario, new { @readonly = "readonly", @class = "form-control" })
+                        </td>
+                    </tr>
+                    <tr class="datosReceta" style="display:none">
+                        <td>
+                            Fecha Generación: @Html.Kendo().DatePickerFor(model => model.FechaGeneracion).Enable(false)
+                        </td>
+                    </tr>
+                </table>
+                <hr />
+                <table>
+                    <tr>
+                        <td>
+                            <input type="submit" id="limpiar" value="Limpiar" class="btn btn-default" />
+                        </td>
+                    </tr>
+                </table>
+                @Html.HiddenFor(m => m.IdPersona)
+                @Html.HiddenFor(m => m.IdReceta)
+                @Html.HiddenFor(m => m.EsPaciente)
+
+                <script type="text/javascript">
+                    $(document).ready(function () {
+                        $('#@identificacion').trigger("change");
+                    })
+                </script>
+            }
+        </section>
+    </div>
+</div>

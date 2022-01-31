@@ -186,16 +186,17 @@ namespace GestionHospital.Logica
             return citas;
         }
 
-        public void GuardarDatosAdicionalesCita(CitaMedica cita)
+        public void GuardarDatosAdicionalesCita(CitaMedica cita, Usuario usuario)
         {
             var objData = GetConnection();
 
-            IDbDataParameter[] parameters = new IDbDataParameter[4]
+            IDbDataParameter[] parameters = new IDbDataParameter[5]
             {
                 objData.CreateParameter("@i_id_cita", SqlDbType.Int, 4, cita.IdCita),
                 objData.CreateParameter("@i_diagnostico", SqlDbType.VarChar, 300, cita.Diagnostico),
                 objData.CreateParameter("@i_id_estado", SqlDbType.Int, 4, cita.IdEstado),
-                objData.CreateParameter("@i_fecha_proximo_control", SqlDbType.DateTime, 8)
+                objData.CreateParameter("@i_fecha_proximo_control", SqlDbType.DateTime, 8),
+                objData.CreateParameter("@i_id_usuario", SqlDbType.Int, 4, usuario.IdUsuario)
             };
 
             if (cita.FechaProximoControl != null)
@@ -247,7 +248,7 @@ namespace GestionHospital.Logica
 
             using (TransactionScope tran = new TransactionScope(TransactionScopeOption.Required))
             {
-                GuardarDatosAdicionalesCita(cita);
+                GuardarDatosAdicionalesCita(cita, usuario);
 
                 int idReceta = GuardarReceta(cita.Receta, usuario);
 
@@ -372,6 +373,26 @@ namespace GestionHospital.Logica
             };
 
             objData.Delete("EliminarDetalleReceta", CommandType.StoredProcedure, parameters);
+        }
+
+        public List<Receta> ConsultarRecetasPaciente(int? idPaciente, int? idReceta)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[2]
+            {
+                objData.CreateParameter("@i_id_paciente", SqlDbType.Int, 4),
+                objData.CreateParameter("@i_id_receta", SqlDbType.Int, 4)
+            };
+
+            if (idPaciente != null)
+                parameters[0].Value = idPaciente.GetValueOrDefault();
+            if (idReceta != null)
+                parameters[1].Value = idReceta.GetValueOrDefault();
+
+            var recetas = objData.ConsultarDatos<Receta>("ConsultarRecetasPacientes", parameters);
+
+            return recetas;
         }
 
         #endregion

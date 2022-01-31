@@ -11,6 +11,10 @@
 	[FechaProximoControl]	DATETIME			NULL,
 	[IdEstado]				INT					NULL,
 	[Reagendada]			BIT					NULL,
+	[IdUsuarioCreacion]		INT					NULL,
+	[FechaCreacion]			DATETIME			NULL,
+	[IdUsuarioModificacion]	INT					NULL,
+	[FechaModificacion]		DATETIME			NULL,
 	CONSTRAINT [PK_Cita] PRIMARY KEY (IdCita),
 	CONSTRAINT [FK_IdPersona] FOREIGN KEY (IdPaciente) REFERENCES Persona(IdPersona)
 )

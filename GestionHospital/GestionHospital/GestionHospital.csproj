@@ -193,6 +193,7 @@
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\Procesos\GestionCitasView.cs" />
     <Compile Include="Models\Procesos\AgendamientoCitasView.cs" />
+    <Compile Include="Models\Procesos\RecetasView.cs" />
     <Compile Include="Models\Seguridad\RolesSeguridadView.cs" />
     <Compile Include="Models\Seguridad\PermisosView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -204,6 +205,7 @@
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\images\loading.gif" />
+    <Content Include="Content\images\LogoHospital.jpg" />
     <Content Include="Content\kendo\Black\editor.png" />
     <Content Include="Content\kendo\Black\imagebrowser.png" />
     <Content Include="Content\kendo\Black\indeterminate.gif" />
@@ -2792,6 +2794,7 @@
     <Content Include="Views\Seguridad\_Permisos.cshtml" />
     <Content Include="Views\Seguridad\_RolesSeguridad.cshtml" />
     <Content Include="Views\Administracion\_DetallesCatalogo.cshtml" />
+    <Content Include="Views\Procesos\_Recetas.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

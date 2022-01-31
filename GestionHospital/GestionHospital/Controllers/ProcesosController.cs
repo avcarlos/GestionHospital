@@ -908,6 +908,26 @@ namespace GestionHospital.Controllers
             }
         }
 
+        public ActionResult ImprimirReceta(int idReceta)
+        {
+            ProcesosCore objProcesos = new ProcesosCore();
+
+            RecetasView vistaReceta = new RecetasView();
+
+            var datosRecetas = objProcesos.ConsultarRecetasPaciente(null, idReceta);
+            var datosReceta = datosRecetas.FirstOrDefault();
+
+            vistaReceta.NombreMedico = datosReceta.NombreMedico;
+            vistaReceta.NombreMedico = datosReceta.NombrePaciente;
+            vistaReceta.FechaEmision = datosReceta.Fecha;
+            vistaReceta.ObservacionesReceta = datosReceta.Observaciones;
+            vistaReceta.LoginUsuario = datosReceta.LoginUsuario;
+            vistaReceta.FechaGeneracion = datosReceta.FechaModificacion;
+            vistaReceta.Detalles = objProcesos.ConsultarDetallesReceta(vistaReceta.IdReceta);
+
+            return new Rotativa.ViewAsPdf("PrintReceta", vistaReceta);
+        }
+
         #endregion
 
         #region Comunes

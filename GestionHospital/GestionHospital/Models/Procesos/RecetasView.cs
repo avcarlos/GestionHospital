@@ -1,4 +1,6 @@
-﻿using System;
+﻿using GestionHospital.Model.Shared;
+using System;
+using System.Collections.Generic;
 
 namespace GestionHospital.Models.Procesos
 {
@@ -23,5 +25,7 @@ namespace GestionHospital.Models.Procesos
         public DateTime FechaGeneracion { get; set; }
 
         public bool EsPaciente { get; set; }
+
+        public List<DetalleReceta> Detalles { get; set; }
     }
 }

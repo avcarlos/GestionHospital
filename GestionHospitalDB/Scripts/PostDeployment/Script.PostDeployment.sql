@@ -102,7 +102,7 @@ IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 4) INSERT INTO dbo.
 IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 5) INSERT INTO dbo.Catalogo (IdCatalogo, Nombre, Estado) VALUES (5, 'Ciudad', 1)
 IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 6) INSERT INTO dbo.Catalogo (IdCatalogo, Nombre, Estado) VALUES (6, 'Tipo Horario', 1)
 IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 101) INSERT INTO dbo.Catalogo (IdCatalogo, Nombre, Estado, Administrable) VALUES (101, 'Medicamentos', 1, 1)
-IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 102) INSERT INTO dbo.Catalogo (IdCatalogo, Nombre, Estado) VALUES (102, 'Exámenes Médicos', 1)
+IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 102) INSERT INTO dbo.Catalogo (IdCatalogo, Nombre, Estado, Administrable) VALUES (102, 'Exámenes Médicos', 1, 1)
 
 SET IDENTITY_INSERT dbo.Catalogo OFF
 

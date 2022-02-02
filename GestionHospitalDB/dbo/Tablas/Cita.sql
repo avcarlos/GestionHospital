@@ -16,5 +16,7 @@
 	[IdUsuarioModificacion]	INT					NULL,
 	[FechaModificacion]		DATETIME			NULL,
 	CONSTRAINT [PK_Cita] PRIMARY KEY (IdCita),
-	CONSTRAINT [FK_IdPersona] FOREIGN KEY (IdPaciente) REFERENCES Persona(IdPersona)
+	CONSTRAINT [FK_IdPersona] FOREIGN KEY (IdPaciente) REFERENCES Persona(IdPersona),
+	CONSTRAINT [FK_IdEspecialidadMedico] FOREIGN KEY (IdEspecialidadMedico) REFERENCES EspecialidadMedico(IdEspecialidadMedico),
+	CONSTRAINT [FK_IdHorario] FOREIGN KEY (IdHorario) REFERENCES Horario(IdHorario)
 )

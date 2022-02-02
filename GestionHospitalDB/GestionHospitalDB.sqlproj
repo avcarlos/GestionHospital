@@ -73,7 +73,6 @@
     <Build Include="dbo\Tablas\Especialidad.sql" />
     <Build Include="dbo\Tablas\EspecialidadMedico.sql" />
     <Build Include="dbo\Tablas\Horario.sql" />
-    <Build Include="dbo\Tablas\Factura.sql" />
     <Build Include="dbo\Tablas\Cita.sql" />
     <Build Include="dbo\Tablas\TipoPersona.sql" />
     <Build Include="dbo\Tablas\Catalogo.sql" />

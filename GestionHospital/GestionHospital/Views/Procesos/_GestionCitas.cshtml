@@ -71,7 +71,7 @@
                     var idMedicoParam = $('#IdMedico').val();
                     var fechaParam = $('#FechaConsulta').val();
 
-                    $('#GridCitas').data('kendoGrid').dataSource.read({ IdMedico: idMedicoParam, fechaCitas: fechaParam });
+                    $('#GridCitas').data('kendoGrid').dataSource.read({ idMedico: idMedicoParam, fechaCitas: fechaParam });
                 }
 
                 function onRowSelectedCita() {
@@ -139,54 +139,54 @@
                 @Html.AntiForgeryToken()
                 <hr />
                 @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-                <table style="width: 80%">
-                    <tr>
-                        <td>
-                            Identificación:
-                        </td>
-                        <td>
-                            @if (Model.EsMedico)
-                            {
-                                @Html.TextBoxFor(m => m.IdentificacionMedico, new { @readonly = "readonly", @class = "form-control" })
-                            }
-                            else
-                            {
-                                @Html.TextBoxFor(m => m.IdentificacionMedico, new { @class = "form-control" })
-                            }
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            Médico:
-                        </td>
-                        <td>
-                            @if (Model.EsMedico)
-                            {
-                                @Html.TextBoxFor(model => model.NombreMedico, new { @readonly = "readonly", @class = "form-control" })
-                            }
-                            else
-                            {
-                                @Html.TextBoxFor(model => model.NombreMedico, new { @class = "form-control" })
-                            }
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width:20%">
-                            Fecha Consulta:
-                        </td>
-                        <td>
-                            @Html.Kendo().DatePickerFor(model => model.FechaConsulta).Min(Model.FechaActual)
-                            <input type="button" id="consultar" value="Consultar" class="btn btn-default" onclick="cargarGridCitas()" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            Citas:
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="3">
-                            @(
+        <table style="width: 80%">
+            <tr>
+                <td>
+                    Identificación:
+                </td>
+                <td>
+                    @if (Model.EsMedico)
+                    {
+                        @Html.TextBoxFor(m => m.IdentificacionMedico, new { @readonly = "readonly", @class = "form-control" })
+                    }
+                    else
+                    {
+                        @Html.TextBoxFor(m => m.IdentificacionMedico, new { @class = "form-control" })
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Médico:
+                </td>
+                <td>
+                    @if (Model.EsMedico)
+                    {
+                        @Html.TextBoxFor(model => model.NombreMedico, new { @readonly = "readonly", @class = "form-control" })
+                    }
+                    else
+                    {
+                        @Html.TextBoxFor(model => model.NombreMedico, new { @class = "form-control" })
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td style="width:20%">
+                    Fecha Consulta:
+                </td>
+                <td>
+                    @Html.Kendo().DatePickerFor(model => model.FechaConsulta).Min(Model.FechaActual)
+                    <input type="button" id="consultar" value="Consultar" class="btn btn-default" onclick="cargarGridCitas()" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Citas:
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    @(
                                 Html.Kendo()
                                 .Grid<GestionHospital.Model.Shared.CitaMedica>()
                                 .Name("GridCitas")
@@ -206,54 +206,54 @@
                                 .Events(events => events.Change("onRowSelectedCita") )
                                 .AutoBind(false)
                             )
-                        </td>
-                    </tr>
-                    <tr class="datosCita" style="display:none">
-                        <td>
-                            Fecha:
-                        </td>
-                        <td>
-                            @Html.Kendo().DatePickerFor(model => model.FechaCita).Enable(false)
-                        </td>
-                    </tr>
-                    <tr class="datosCita" style="display:none">
-                        <td>
-                            Hora:
-                        </td>
-                        <td>
-                            @Html.TextBoxFor(m => m.HoraCita, new { @readonly = "readonly", @class = "form-control" })
-                        </td>
-                    </tr>
-                    <tr class="datosCita" style="display:none">
-                        <td>
-                            Paciente:
-                        </td>
-                        <td>
-                            @Html.TextBoxFor(m => m.NombrePaciente, new { @readonly = "readonly", @class = "form-control" })
-                        </td>
-                    </tr>
-                    <tr class="datosCita" style="display:none">
-                        <td>
-                            Motivo:
-                        </td>
-                        <td colspan="2">
-                            @Html.TextAreaFor(m => m.Motivo, 3, 500, new { style = "width: 80%; max-width: 100%", @readonly = "readonly", @class = "form-control" })
-                        </td>
-                    </tr>
-                    <tr class="datosCita" style="display:none">
-                        <td>
-                            Diagnóstico:
-                        </td>
-                        <td colspan="2">
-                            @Html.TextAreaFor(m => m.Diagnostico, 3, 500, new { style = "width: 80%; max-width: 100%", @class = "form-control" })
-                        </td>
-                    </tr>
-                    <tr class="datosCita" style="display:none">
-                        <td>
-                            Exámenes:
-                        </td>
-                        <td colspan="3">
-                            @(
+                </td>
+            </tr>
+            <tr class="datosCita" style="display:none">
+                <td>
+                    Fecha:
+                </td>
+                <td>
+                    @Html.Kendo().DatePickerFor(model => model.FechaCita).Enable(false)
+                </td>
+            </tr>
+            <tr class="datosCita" style="display:none">
+                <td>
+                    Hora:
+                </td>
+                <td>
+                    @Html.TextBoxFor(m => m.HoraCita, new { @readonly = "readonly", @class = "form-control" })
+                </td>
+            </tr>
+            <tr class="datosCita" style="display:none">
+                <td>
+                    Paciente:
+                </td>
+                <td>
+                    @Html.TextBoxFor(m => m.NombrePaciente, new { @readonly = "readonly", @class = "form-control" })
+                </td>
+            </tr>
+            <tr class="datosCita" style="display:none">
+                <td>
+                    Motivo:
+                </td>
+                <td colspan="2">
+                    @Html.TextAreaFor(m => m.Motivo, 3, 500, new { style = "width: 80%; max-width: 100%", @readonly = "readonly", @class = "form-control" })
+                </td>
+            </tr>
+            <tr class="datosCita" style="display:none">
+                <td>
+                    Diagnóstico:
+                </td>
+                <td colspan="2">
+                    @Html.TextAreaFor(m => m.Diagnostico, 3, 500, new { style = "width: 80%; max-width: 100%", @class = "form-control" })
+                </td>
+            </tr>
+            <tr class="datosCita" style="display:none">
+                <td>
+                    Exámenes:
+                </td>
+                <td colspan="3">
+                    @(
                                 Html.Kendo()
                                     .Grid<GestionHospital.Model.Shared.ExamenMedico>()
                                     .Name("GridExamenes")
@@ -285,14 +285,14 @@
                                     .Resizable(r => r.Columns(true))
                                     .AutoBind(false)
                             )
-                        </td>
-                    </tr>
-                    <tr class="datosCita" style="display:none">
-                        <td>
-                            Receta:
-                        </td>
-                        <td colspan="3">
-                            @(
+                </td>
+            </tr>
+            <tr class="datosCita" style="display:none">
+                <td>
+                    Receta:
+                </td>
+                <td colspan="3">
+                    @(
                                 Html.Kendo()
                                     .Grid<GestionHospital.Model.Shared.DetalleReceta>()
                                     .Name("GridReceta")
@@ -324,32 +324,32 @@
                                     .Resizable(r => r.Columns(true))
                                     .AutoBind(false)
                             )
-                        </td>
-                    </tr>
-                    <tr class="datosCita" style="display:none">
-                        <td>
-                        </td>
-                        <td colspan="2">
-                            @Html.TextAreaFor(m => m.Receta.Observaciones, 3, 500, new { style = "width: 80%; max-width: 100%", @class = "form-control" })
-                        </td>
-                    </tr>
-                    <tr class="datosCita" style="display:none">
-                        <td>
-                            Estado:
-                        </td>
-                        <td colspan="2">
-                            @Html.Kendo().DropDownListFor(m => m.IdEstadoCita).BindTo(new SelectList(Model.ListaEstados, "IdDetalleCatalogo", "Nombre"))
-                        </td>
-                    </tr>
-                    <tr class="datosCita" style="display:none">
-                        <td style="width:20%">
-                            Fecha Próximo Control:
-                        </td>
-                        <td>
-                            @Html.Kendo().DatePickerFor(model => model.FechaProximoControl).Min(Model.FechaActual)
-                        </td>
-                    </tr>
-                </table>
+                </td>
+            </tr>
+            <tr class="datosCita" style="display:none">
+                <td>
+                </td>
+                <td colspan="2">
+                    @Html.TextAreaFor(m => m.Receta.Observaciones, 3, 500, new { style = "width: 80%; max-width: 100%", @class = "form-control" })
+                </td>
+            </tr>
+            <tr class="datosCita" style="display:none">
+                <td>
+                    Estado:
+                </td>
+                <td colspan="2">
+                    @Html.Kendo().DropDownListFor(m => m.IdEstadoCita).BindTo(new SelectList(Model.ListaEstados, "IdDetalleCatalogo", "Nombre"))
+                </td>
+            </tr>
+            <tr class="datosCita" style="display:none">
+                <td style="width:20%">
+                    Fecha Próximo Control:
+                </td>
+                <td>
+                    @Html.Kendo().DatePickerFor(model => model.FechaProximoControl).Min(Model.FechaActual)
+                </td>
+            </tr>
+        </table>
                 <hr />
                 <table>
                     <tr>

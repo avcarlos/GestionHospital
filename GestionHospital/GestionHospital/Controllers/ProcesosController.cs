@@ -918,12 +918,12 @@ namespace GestionHospital.Controllers
             var datosReceta = datosRecetas.FirstOrDefault();
 
             vistaReceta.NombreMedico = datosReceta.NombreMedico;
-            vistaReceta.NombreMedico = datosReceta.NombrePaciente;
+            vistaReceta.NombrePaciente = datosReceta.NombrePaciente;
             vistaReceta.FechaEmision = datosReceta.Fecha;
             vistaReceta.ObservacionesReceta = datosReceta.Observaciones;
             vistaReceta.LoginUsuario = datosReceta.LoginUsuario;
             vistaReceta.FechaGeneracion = datosReceta.FechaModificacion;
-            vistaReceta.Detalles = objProcesos.ConsultarDetallesReceta(vistaReceta.IdReceta);
+            vistaReceta.Detalles = objProcesos.ConsultarDetallesReceta(idReceta);
 
             return new Rotativa.ViewAsPdf("PrintReceta", vistaReceta);
         }

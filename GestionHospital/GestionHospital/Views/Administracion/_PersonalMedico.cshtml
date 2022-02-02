@@ -42,6 +42,7 @@
 
                             $('#mensajeError').hide();
                             $('#mensajeExito').hide();
+                            $('#generarPassword').hide();
 
                             document.getElementById('guardar').disabled = 'disabled';
                             document.getElementById('actualizar').disabled = 'disabled';
@@ -80,11 +81,12 @@
                                             document.getElementById('actualizar').disabled = '';
 
                                             if (result.EstadoTipo) {
+                                                $('#generarPassword').show();
                                                 document.getElementById('eliminar').disabled = '';
                                             } else {
                                                 $('#estadoMedico').show();
                                             }
-                                            
+
                                             refrescarGridEspecialidades();
                                         }
 
@@ -131,6 +133,29 @@
                     var identificacionParam = $('#@identificacion').val();
 
                     return { identificacion: identificacionParam };
+                }
+
+                function generarPasswordMedico() {
+                    var idMedicoParam = $('#IdPersona').val();
+
+                    mostrarVentanaCargando();
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("GenerarPasswordMedico", "Account")',
+                        data: { idMedico: idMedicoParam },
+                        success: function (result) {
+                            if (result != "") {
+                                alert('La nueva contraseña es: ' + result.password);
+                            }
+                        },
+                        error: function (err) {
+                            alert('Error al generar contraseña: ' + err.responseJSON);
+                        },
+                        complete: function () {
+                            cerrarVentanaCargando();
+                        }
+                    });
                 }
             </script>
             @using (Html.BeginForm())
@@ -277,6 +302,7 @@
                             <input type="submit" id="guardar" value="Guardar" class="btn btn-default" @(string.IsNullOrEmpty(Model.Identificacion) ? "disabled" : "") />
                             <input type="submit" id="actualizar" value="Actualizar" class="btn btn-default" @(Model.IdTipoPersona != 5 ? "disabled" : "") />
                             <input type="submit" id="eliminar" value="Eliminar" class="btn btn-default" @(Model.IdTipoPersona != 5 ? "disabled" : "") />
+                            <input type="button" id="generarPassword" value="Generar Contraseña" class="btn btn-default" onclick="generarPasswordMedico()" style="display:none" />
                             <input type="submit" id="limpiar" value="Limpiar" class="btn btn-default" />
                         </td>
                     </tr>

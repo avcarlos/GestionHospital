@@ -115,6 +115,8 @@
                 function generarPasswordPaciente() {
                     var idPersonaParam = $('#IdPersona').val();
 
+                    mostrarVentanaCargando();
+
                     $.ajax({
                         type: "POST",
                         url: '@Url.Action("GenerarPasswordPaciente", "Account")',

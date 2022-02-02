@@ -543,37 +543,13 @@ namespace GestionHospital.Controllers
             base.Dispose(disposing);
         }
 
-        public JsonResult GenerarPasswordPaciente(int idPersona)
+        public JsonResult GenerarPasswordUsuario(Usuario usuario)
         {
-            AdministracionCore objAdministracion = new AdministracionCore();
             SeguridadCore objSeguridad = new SeguridadCore();
 
             try
             {
-                var persona = objAdministracion.ConsultarPersonaId(idPersona);
-
-                if (string.IsNullOrEmpty(persona.Email))
-                    throw new Exception("Se requiere correo electrónico.");
-
-                var usuario = objSeguridad.ConsultarUsuario(persona.Email);
-
-                if (usuario != null)
-                {
-                    if (usuario.IdPersona.GetValueOrDefault() == 0)
-                    {
-                        usuario.IdPersona = idPersona;
-
-                        objSeguridad.RegistrarPersonaUsuario(usuario);
-                    }
-                }
-                else
-                {
-                    usuario = new Usuario() { LoginUsuario = persona.Email, IdRolSeguridad = 2, IdPersona = idPersona };
-
-                    usuario.IdUsuario = objSeguridad.GuardarUsuario(usuario);
-                }
-
-                var user = UserManager.FindByName(persona.Email);
+                var user = UserManager.FindByName(usuario.LoginUsuario);
                 string password = objSeguridad.GenerarPasswordUsuario(usuario);
 
                 if (user != null)
@@ -599,7 +575,7 @@ namespace GestionHospital.Controllers
                 }
                 else
                 {
-                    user = new ApplicationUser { UserName = persona.Email, Email = persona.Email };
+                    user = new ApplicationUser { UserName = usuario.LoginUsuario, Email = usuario.LoginUsuario };
                     var result = UserManager.Create(user, password);
 
                     if (!result.Succeeded)
@@ -629,6 +605,54 @@ namespace GestionHospital.Controllers
             {
                 return RetornarErrorJsonResult(ex.Message);
             }
+        }
+
+        public JsonResult GenerarPasswordPersona(int idPersona, int idRolSeguridad)
+        {
+            AdministracionCore objAdministracion = new AdministracionCore();
+            SeguridadCore objSeguridad = new SeguridadCore();
+
+            try
+            {
+                var persona = objAdministracion.ConsultarPersonaId(idPersona);
+
+                if (string.IsNullOrEmpty(persona.Email))
+                    throw new Exception("Se requiere correo electrónico.");
+
+                var usuario = objSeguridad.ConsultarUsuario(persona.Email);
+
+                if (usuario != null)
+                {
+                    if (usuario.IdPersona.GetValueOrDefault() == 0)
+                    {
+                        usuario.IdPersona = idPersona;
+
+                        objSeguridad.RegistrarPersonaUsuario(usuario);
+                    }
+                }
+                else
+                {
+                    usuario = new Usuario() { LoginUsuario = persona.Email, IdRolSeguridad = idRolSeguridad, IdPersona = idPersona };
+
+                    usuario.IdUsuario = objSeguridad.GuardarUsuario(usuario);
+                }
+
+                return GenerarPasswordUsuario(usuario);
+            }
+            catch (Exception ex)
+            {
+                return RetornarErrorJsonResult(ex.Message);
+            }
+        }
+
+        public JsonResult GenerarPasswordPaciente(int idPersona)
+        {
+            return GenerarPasswordPersona(idPersona, 2);
+        }
+
+        public JsonResult GenerarPasswordMedico(int idMedico)
+        {
+            return GenerarPasswordPersona(idMedico, 5);
         }
 
         #region Comunes

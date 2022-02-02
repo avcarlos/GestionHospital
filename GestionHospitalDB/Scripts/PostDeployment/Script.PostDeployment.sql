@@ -94,7 +94,7 @@ SET IDENTITY_INSERT dbo.TransaccionRolSeguridad OFF
 -- Usuarios
 SET IDENTITY_INSERT dbo.Usuario ON
 
-IF NOT EXISTS (SELECT 1 FROM dbo.Usuario WHERE IdUsuario = 1) INSERT INTO dbo.Usuario (IdUsuario, LoginUsuario, IdRolSeguridad, Estado) VALUES (1, 'administrador@pruebas.com', 1, 1)
+IF NOT EXISTS (SELECT 1 FROM dbo.Usuario WHERE IdUsuario = 1) INSERT INTO dbo.Usuario (IdUsuario, LoginUsuario, PasswordUsuario, IdRolSeguridad, Estado) VALUES (1, 'administrador@pruebas.com', PWDENCRYPT('Pruebas.1'), 1, 1)
 
 SET IDENTITY_INSERT dbo.Usuario OFF
 

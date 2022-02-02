@@ -76,6 +76,48 @@ namespace GestionHospital.Controllers
                 return View(model);
             }
 
+            // Para primer inicio de sesion de usuarios administradores del sistema
+            var user = UserManager.FindByName(model.Email);
+
+            if (user == null)
+            {
+                SeguridadCore objSeguridad = new SeguridadCore();
+
+                var usuario = objSeguridad.ConsultarUsuario(model.Email);
+
+                if (usuario != null)
+                {
+                    if (usuario.IdRolSeguridad == 1)
+                    {
+                        if (objSeguridad.ValidarPasswordUsuario(usuario, model.Password))
+                        {
+                            user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                            var resultadoCreacion = UserManager.Create(user, model.Password);
+
+                            if (!resultadoCreacion.Succeeded)
+                            {
+                                string mensaje = "";
+
+                                foreach (var error in resultadoCreacion.Errors)
+                                {
+                                    if (string.IsNullOrEmpty(mensaje))
+                                        mensaje = error;
+                                    else
+                                        mensaje += ". " + error;
+                                }
+
+                                throw new Exception(mensaje);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError("", "No existe el usuario ingresado.");
+                    return View(model);
+                }
+            }
+
             // No cuenta los errores de inicio de sesión para el bloqueo de la cuenta
             // Para permitir que los errores de contraseña desencadenen el bloqueo de la cuenta, cambie a shouldLockout: true
             var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);

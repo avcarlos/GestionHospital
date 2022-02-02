@@ -131,6 +131,7 @@
     <Build Include="dbo\Procedimientos Almacenados\ConsultarExamenesCita.sql" />
     <Build Include="dbo\Procedimientos Almacenados\GuardarExamenCita.sql" />
     <Build Include="dbo\Procedimientos Almacenados\ConsultarRecetasPacientes.sql" />
+    <Build Include="dbo\Procedimientos Almacenados\ValidarPasswordUsuario.sql" />
   </ItemGroup>
   <ItemGroup>
     <PreDeploy Include="Scripts\PreDeployment\Script.PreDeployment.sql" />

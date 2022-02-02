@@ -2,7 +2,7 @@
 (
 	[IdUsuario]			INT IDENTITY(1,1)	NOT NULL,
 	[LoginUsuario]		VARCHAR(30)			NOT NULL,
-	[PasswordUsuario]	VARCHAR(20)			NULL,
+	[PasswordUsuario]	VARBINARY(MAX)		NULL,
 	[IdRolSeguridad]	INT					NOT NULL,
 	[IdPersona]			INT					NULL,
 	[Estado]			BIT					NULL,

@@ -3,6 +3,7 @@ using GestionHospital.Model.Shared;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -135,6 +136,32 @@ namespace GestionHospital.Logica
                 existe = true;
 
             return existe;
+        }
+
+        public bool ValidarPasswordUsuario(Usuario usuario, string password)
+        {
+            var objData = GetConnection();
+
+            bool valido = false;
+
+            IDbDataParameter[] parameters = new IDbDataParameter[3]
+            {
+                objData.CreateParameter("@i_id_usuario", SqlDbType.Int, 4, usuario.IdUsuario),
+                objData.CreateParameter("@i_password", SqlDbType.VarChar, 300, password),
+                objData.CreateParameter("@o_valido", SqlDbType.Bit, 1, ParameterDirection.Output)
+            };
+
+            var retorno = objData.Execute("ValidarPasswordUsuario", CommandType.StoredProcedure, parameters);
+
+            if (retorno != null && retorno.Count() > 0)
+            {
+                var datoRetorno = (SqlParameter)retorno[0];
+
+                if (datoRetorno.SqlDbType == SqlDbType.Bit)
+                    valido = (bool)datoRetorno.Value;
+            }
+
+            return valido;
         }
 
         #endregion

@@ -51,6 +51,25 @@ namespace GestionHospital.Logica
             return citas;
         }
 
+        public List<CitaMedica> ConsultarCitasReportes(DateTime fechaDesde, DateTime fechaHasta, int? idEstado)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[3]
+            {
+                objData.CreateParameter("@i_id_estado", SqlDbType.Int, 4),
+                objData.CreateParameter("@i_fecha_desde", SqlDbType.DateTime, 8, fechaDesde),
+                objData.CreateParameter("@i_fecha_hasta", SqlDbType.DateTime, 8, fechaHasta)
+            };
+
+            if (idEstado != null)
+                parameters[0].Value = idEstado.GetValueOrDefault();
+
+            var citas = objData.ConsultarDatos<CitaMedica>("ConsultarCitasReportes", parameters);
+
+            return citas;
+        }
+
         public CitaMedica ConsultarDatosCompletosCitas(CitaMedica cita)
         {
             AdministracionCore objAdministracion = new AdministracionCore();
@@ -452,7 +471,9 @@ namespace GestionHospital.Logica
 
             if (citas.Exists(c => c.IdCalificacion == 0))
             {
-                foreach (var cita in citas.FindAll(c => c.IdCalificacion == 0))
+                citas = citas.FindAll(c => c.IdCalificacion == 0);
+
+                foreach (var cita in citas)
                 {
                     var datosCita = ConsultarDatosCompletosCitas(cita);
 
@@ -480,6 +501,31 @@ namespace GestionHospital.Logica
                 parameters[3].Value = cita.FechaProximoControl.GetValueOrDefault();
 
             objData.Insert("RegistrarCalificacionCita", CommandType.StoredProcedure, parameters);
+        }
+
+        public List<CitaMedica> ConsultarCitasCalificadas(DateTime fechaDesde, DateTime fechaHasta)
+        {
+            AdministracionCore objAdministracion = new AdministracionCore();
+
+            var citas = ConsultarCitasReportes(fechaDesde, fechaHasta, 16);
+
+            if (citas.Exists(c => c.IdCalificacion > 0))
+            {
+                citas = citas.FindAll(c => c.IdCalificacion > 0);
+
+                foreach (var cita in citas)
+                {
+                    var datosCita = ConsultarDatosCompletosCitas(cita);
+
+                    cita.NombreEspecialidad = datosCita.NombreEspecialidad;
+                    cita.NombreMedico = datosCita.NombreMedico;
+                    cita.Calificacion = objAdministracion.ConsultarDetalleCatalogo(cita.IdCalificacion).Parametro1.GetValueOrDefault();
+                }
+            }
+            else
+                citas = new List<CitaMedica>();
+
+            return citas;
         }
 
         #endregion

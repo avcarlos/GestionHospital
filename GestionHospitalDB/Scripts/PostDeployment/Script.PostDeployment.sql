@@ -29,6 +29,7 @@ IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion = 111) INSERT I
 IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion = 112) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (112, 'Recetas', 1, 'Procesos\Recetas')
 IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion = 113) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (113, 'Calificación Citas', 1, 'Procesos\CalificacionCitas')
 IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion = 201) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (201, 'Estadísticas', 1, 'Consultas\Estadistica')
+IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion = 202) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (202, 'Detalle Calificaciones', 1, 'Consultas\ReporteDetalleCalificaciones')
 IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion = 901) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (901, 'Roles', 1, 'Seguridad\Roles')
 IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion = 911) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (911, 'Permisos', 1, 'Seguridad\Permisos')
 IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion = 921) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (921, 'Usuarios', 1, 'Seguridad\Usuarios')
@@ -92,6 +93,7 @@ IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 
 
 -- Nuevas Transacciones Examen Complexivo
 IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 2 AND IdTransaccion = 113) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (34, 2, 113)
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 1 AND IdTransaccion = 202) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (35, 1, 202)
 
 SET IDENTITY_INSERT dbo.TransaccionRolSeguridad OFF
 

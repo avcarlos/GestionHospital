@@ -1,0 +1,76 @@
+﻿@using GestionHospital.Models.Consultas
+@model ReporteDetallesCalificacionesView
+
+<h2>@ViewBag.Title.</h2>
+<h4 id="mensajeError" class="text-danger" style="display:@(string.IsNullOrEmpty(ViewBag.MessageError) ? "none" : string.Empty)">@ViewBag.MessageError.</h4>
+<h4 id="mensajeExito" class="text-info" style="display:@(string.IsNullOrEmpty(ViewBag.Message) ? "none" : string.Empty)">@ViewBag.Message.</h4>
+<div class="row">
+    <div class="col-md-11">
+        <section id="medicoForm">
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $('#consultar').click(function () {
+                        $('form').attr('Action', '/Consultas/ConsultarDetallesCalificaciones');
+                    });
+
+                    $('#limpiar').click(function () {
+                        $('form').attr('Action', '/Consultas/ReporteDetalleCalificaciones');
+                    });
+                })
+            </script>
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <table style="width: 80%">
+                    <tr class="datosCita">
+                        <td>
+                            Fecha Desde:
+                        </td>
+                        <td>
+                            @Html.Kendo().DatePickerFor(model => model.FechaDesde)
+                            @Html.ValidationMessageFor(m => m.FechaDesde, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr class="datosCita">
+                        <td>
+                            Fecha Hasta:
+                        </td>
+                        <td>
+                            @Html.Kendo().DatePickerFor(model => model.FechaHasta)
+                            @Html.ValidationMessageFor(m => m.FechaHasta, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            @(
+                                Html.Kendo()
+                                .Grid<GestionHospital.Model.Shared.CitaMedica>(Model.DatosReporte)
+                                .Name("GridCitas")
+                                .Columns(c =>
+                                {
+                                    c.Bound(col => col.IdCita).Title("Id");
+                                    c.Bound(col => col.NombreMedico).Title("Médico");
+                                    c.Bound(col => col.IdPaciente).Title("Id del Paciente");
+                                    c.Bound(col => col.Fecha).Title("Fecha atención cita médica").Format("{0:dd/MM/yyyy}");
+                                    c.Bound(col => col.Calificacion).Title("Calificación");
+                                })
+                                .DataSource(dataBinding => dataBinding.Server())
+                            )
+                        </td>
+                    </tr>
+                </table>
+                <hr />
+                <table>
+                    <tr>
+                        <td>
+                            <input type="submit" id="consultar" value="Consultar" class="btn btn-default" />
+                            <input type="submit" id="limpiar" value="Limpiar" class="btn btn-default" />
+                        </td>
+                    </tr>
+                </table>
+            }
+        </section>
+    </div>
+</div>

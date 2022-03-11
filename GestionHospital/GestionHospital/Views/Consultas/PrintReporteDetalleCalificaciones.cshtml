@@ -1,0 +1,68 @@
+﻿@{
+    Layout = null;
+}
+
+@using GestionHospital.Models.Consultas
+@model ReporteDetallesCalificacionesView
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>View</title>
+</head>
+<body>
+    <div>
+        <table style="width: 80%">
+            <tr>
+                <td colspan="2">
+                    DETALLE DE CALIFICACIÓN DE CITAS MÉDICAS
+                </td>
+            </tr>
+        </table>
+        <br />
+        <hr />
+        <br />
+        <table border="1">
+            <tr>
+                <td>
+                    <b>Id</b>
+                </td>
+                <td>
+                    <b>Médico</b>
+                </td>
+                <td>
+                    <b>Id del Paciente</b>
+                </td>
+                <td>
+                    <b>Fecha atención cita médica</b>
+                </td>
+                <td>
+                    <b>Calificación</b>
+                </td>
+            </tr>
+            @foreach (var detalle in Model.DatosReporte)
+            {
+                <tr>
+                    <td>
+                        @detalle.IdCita
+                    </td>
+                    <td>
+                        @detalle.NombreMedico
+                    </td>
+                    <td>
+                        @detalle.IdPaciente
+                    </td>
+                    <td>
+                        @detalle.Fecha.ToString("dd/MM/yyyy")
+                    </td>
+                    <td>
+                        @detalle.Calificacion
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+</body>
+</html>

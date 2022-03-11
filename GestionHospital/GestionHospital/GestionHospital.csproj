@@ -2822,6 +2822,7 @@
     <Content Include="Views\Procesos\PrintReceta.cshtml" />
     <Content Include="Views\Procesos\_CalificacionCitas.cshtml" />
     <Content Include="Views\Consultas\_ReporteDetalleCalificaciones.cshtml" />
+    <Content Include="Views\Consultas\PrintReporteDetalleCalificaciones.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -60,6 +60,8 @@ namespace GestionHospital.Controllers
                 if (ModelState.IsValid)
                 {
                     vistaReporte.DatosReporte = objProcesos.ConsultarCitasCalificadas(vistaReporte.FechaDesde, vistaReporte.FechaHasta);
+
+                    Session["DatosReporteDetallesCalificaciones"] = vistaReporte.DatosReporte;
                 }
             }
             catch (Exception ex)
@@ -68,6 +70,17 @@ namespace GestionHospital.Controllers
             }
 
             return View("_ReporteDetalleCalificaciones", vistaReporte);
+        }
+
+        public ActionResult ImprimirReporteDetalleCalificaciones()
+        {
+            ReporteDetallesCalificacionesView vistaReporte = new ReporteDetallesCalificacionesView();
+
+            var datos = (List<CitaMedica>)System.Web.HttpContext.Current.Session["DatosReporteDetallesCalificaciones"];
+
+            vistaReporte.DatosReporte = datos;
+
+            return new Rotativa.ViewAsPdf("PrintReporteDetalleCalificaciones", vistaReporte);
         }
 
         #endregion

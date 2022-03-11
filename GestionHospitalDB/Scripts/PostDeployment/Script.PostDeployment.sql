@@ -27,6 +27,7 @@ IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion =  31) INSERT I
 IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion = 101) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (101, 'Agenda Citas', 1, 'Procesos\AgendamientoCita')
 IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion = 111) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (111, 'Gestión Citas', 1, 'Procesos\AgendaCitas')
 IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion = 112) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (112, 'Recetas', 1, 'Procesos\Recetas')
+IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion = 113) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (113, 'Calificación Citas', 1, 'Procesos\CalificacionCitas')
 IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion = 201) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (201, 'Estadísticas', 1, 'Consultas\Estadistica')
 IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion = 901) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (901, 'Roles', 1, 'Seguridad\Roles')
 IF NOT EXISTS (SELECT 1 FROM dbo.Transaccion WHERE IdTransaccion = 911) INSERT INTO dbo.Transaccion (IdTransaccion, Nombre, Estado, Menu) VALUES (911, 'Permisos', 1, 'Seguridad\Permisos')
@@ -89,6 +90,9 @@ IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 
 IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 6 AND IdTransaccion = 911) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (32, 6, 911)
 IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 6 AND IdTransaccion = 921) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (33, 6, 921)
 
+-- Nuevas Transacciones Examen Complexivo
+IF NOT EXISTS (SELECT 1 FROM dbo.TransaccionRolSeguridad WHERE IdRolSeguridad = 2 AND IdTransaccion = 113) INSERT INTO dbo.TransaccionRolSeguridad (IdTransaccionRolSeguridad, IdRolSeguridad, IdTransaccion) VALUES (34, 2, 113)
+
 SET IDENTITY_INSERT dbo.TransaccionRolSeguridad OFF
 
 -- Usuarios
@@ -108,6 +112,7 @@ IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 3) INSERT INTO dbo.
 IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 4) INSERT INTO dbo.Catalogo (IdCatalogo, Nombre, Estado) VALUES (4, 'Estado Cita', 1)
 IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 5) INSERT INTO dbo.Catalogo (IdCatalogo, Nombre, Estado) VALUES (5, 'Ciudad', 1)
 IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 6) INSERT INTO dbo.Catalogo (IdCatalogo, Nombre, Estado) VALUES (6, 'Tipo Horario', 1)
+IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 7) INSERT INTO dbo.Catalogo (IdCatalogo, Nombre, Estado) VALUES (7, 'Calificación', 1)
 IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 101) INSERT INTO dbo.Catalogo (IdCatalogo, Nombre, Estado, Administrable) VALUES (101, 'Medicamentos', 1, 1)
 IF NOT EXISTS (SELECT 1 FROM dbo.Catalogo WHERE IdCatalogo = 102) INSERT INTO dbo.Catalogo (IdCatalogo, Nombre, Estado, Administrable) VALUES (102, 'Exámenes Médicos', 1, 1)
 
@@ -151,6 +156,13 @@ IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 1002)
 -- Exámenes Médicos
 IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 1003) INSERT INTO dbo.DetalleCatalogo (IdDetalleCatalogo, IdCatalogo, Nombre, Codigo, Estado) VALUES (1003, 102, 'Examen 1', 'EX1', 1)
 IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 1004) INSERT INTO dbo.DetalleCatalogo (IdDetalleCatalogo, IdCatalogo, Nombre, Codigo, Estado) VALUES (1004, 102, 'Examen 2', 'EX2', 1)
+
+-- Calificaciones
+IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 105) INSERT INTO dbo.DetalleCatalogo (IdDetalleCatalogo, IdCatalogo, Nombre, Codigo, Estado, Parametro1) VALUES (105, 7, 'Deficiente', 'DE', 1, 1)
+IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 106) INSERT INTO dbo.DetalleCatalogo (IdDetalleCatalogo, IdCatalogo, Nombre, Codigo, Estado, Parametro1) VALUES (106, 7, 'Regular', 'RE', 1, 2)
+IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 107) INSERT INTO dbo.DetalleCatalogo (IdDetalleCatalogo, IdCatalogo, Nombre, Codigo, Estado, Parametro1) VALUES (107, 7, 'Bueno', 'BU', 1, 3)
+IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 108) INSERT INTO dbo.DetalleCatalogo (IdDetalleCatalogo, IdCatalogo, Nombre, Codigo, Estado, Parametro1) VALUES (108, 7, 'Muy Bueno', 'MB', 1, 4)
+IF NOT EXISTS (SELECT 1 FROM dbo.DetalleCatalogo WHERE IdDetalleCatalogo = 109) INSERT INTO dbo.DetalleCatalogo (IdDetalleCatalogo, IdCatalogo, Nombre, Codigo, Estado, Parametro1) VALUES (109, 7, 'Excelente', 'EX', 1, 5)
 
 SET IDENTITY_INSERT dbo.DetalleCatalogo OFF
 

@@ -930,6 +930,122 @@ namespace GestionHospital.Controllers
 
         #endregion
 
+        #region Calificación Cita
+
+        [AuthorizeUser(idOperacion: 113)]
+        public ActionResult CalificacionCitas()
+        {
+            ViewBag.Title = "Calificación de Cita";
+
+            AdministracionCore objAdministracion = new AdministracionCore();
+
+            CalificacionCitasView vistaCalificacion = new CalificacionCitasView();
+
+            try
+            {
+                var usuario = (Usuario)System.Web.HttpContext.Current.Session["Usuario"];
+
+                if (usuario.IdRolSeguridad == 2)    // Paciente
+                {
+                    if (usuario.IdPersona.GetValueOrDefault() > 0)
+                    {
+                        var persona = objAdministracion.ConsultarPersonaId(usuario.IdPersona.GetValueOrDefault());
+                        var paciente = objAdministracion.ConsultarPaciente(persona.IdTipoIdentificacion, persona.Identificacion);
+
+                        if (paciente != null && paciente.EstadoTipo)
+                        {
+                            vistaCalificacion.IdPaciente = paciente.IdPersona;
+                            vistaCalificacion.NombrePaciente = paciente.Nombres + " " + paciente.Apellidos;
+
+                            vistaCalificacion.ListaCalificaciones = objAdministracion.ConsultarDetallesCatalogo(7);
+                        }
+                        else
+                            throw new Exception("Paciente se encuentra inactivo. Acerquese al hospital.");
+                    }
+                    else
+                        throw new Exception("Usuario no asignado. Acerquese al hospital.");
+                }
+                else
+                    throw new Exception("Funcionalidad exclusiva para pacientes.");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.MessageError = ex.Message;
+            }
+
+            return View("_CalificacionCitas", vistaCalificacion);
+        }
+
+        public JsonResult CargarCitasPendientesCalificacion([DataSourceRequest]
+                                                    DataSourceRequest request, int idPaciente)
+        {
+            ProcesosCore objProcesos = new ProcesosCore();
+
+            try
+            {
+                var citasPendientes = objProcesos.ConsultarCitasPendientesCalificaciones(idPaciente);
+
+                if (citasPendientes == null)
+                    citasPendientes = new List<CitaMedica>();
+                else
+                    citasPendientes = citasPendientes.OrderBy(c => c.Fecha).OrderBy(c => c.IdHorario).ToList();
+
+                return Json(citasPendientes.ToDataSourceResult(request));
+            }
+            catch (Exception ex)
+            {
+                return RetornarErrorJsonResult(ex.Message);
+            }
+        }
+
+        public ActionResult CalificarCita(CalificacionCitasView vistaCalificacion)
+        {
+            ViewBag.Title = "Calificación de Cita";
+
+            AdministracionCore objAdministracion = new AdministracionCore();
+            ProcesosCore objProcesos = new ProcesosCore();
+
+            List<DetalleCatalogo> listaCalificaciones = new List<DetalleCatalogo>();
+
+            try
+            {
+                int idPaciente = vistaCalificacion.IdPaciente;
+                string nombrePaciente = vistaCalificacion.NombrePaciente;
+                listaCalificaciones = objAdministracion.ConsultarDetallesCatalogo(7);
+
+                if (ModelState.IsValid)
+                {
+                    CitaMedica cita = new CitaMedica()
+                    {
+                        IdCita = vistaCalificacion.IdCita,
+                        IdCalificacion = vistaCalificacion.IdCalificacion
+                    };
+
+                    objProcesos.RegistrarCalificacionCita(cita);
+
+                    vistaCalificacion = new CalificacionCitasView
+                    {
+                        IdPaciente = idPaciente,
+                        NombrePaciente = nombrePaciente
+                    };
+
+                    ModelState.Clear();
+                }
+
+                ViewBag.Message = "Calificación Guardada Correctamente";
+            }
+            catch (Exception ex)
+            {
+                ViewBag.MessageError = ex.Message;
+            }
+
+            vistaCalificacion.ListaCalificaciones = listaCalificaciones;
+
+            return View("_CalificacionCitas", vistaCalificacion);
+        }
+
+        #endregion
+
         #region Comunes
 
         private JsonResult RetornarErrorJsonResult(string mensajeError)

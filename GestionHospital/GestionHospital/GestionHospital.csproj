@@ -208,6 +208,7 @@
     <Compile Include="Models\Administracion\PersonalMedicoView.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\Procesos\CalificacionCitasView.cs" />
     <Compile Include="Models\Procesos\GestionCitasView.cs" />
     <Compile Include="Models\Procesos\AgendamientoCitasView.cs" />
     <Compile Include="Models\Procesos\RecetasView.cs" />
@@ -2818,6 +2819,7 @@
     <Content Include="Views\Administracion\_DetallesCatalogo.cshtml" />
     <Content Include="Views\Procesos\_Recetas.cshtml" />
     <Content Include="Views\Procesos\PrintReceta.cshtml" />
+    <Content Include="Views\Procesos\_CalificacionCitas.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

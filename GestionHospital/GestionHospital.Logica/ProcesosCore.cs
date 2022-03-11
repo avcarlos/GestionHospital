@@ -443,5 +443,45 @@ namespace GestionHospital.Logica
         }
 
         #endregion
+
+        #region Calificaciones Citas
+
+        public List<CitaMedica> ConsultarCitasPendientesCalificaciones(int idPaciente)
+        {
+            var citas = ConsultarCitasMedicas(null, idPaciente, null, 16, null, null, null);
+
+            if (citas.Exists(c => c.IdCalificacion == 0))
+            {
+                foreach (var cita in citas.FindAll(c => c.IdCalificacion == 0))
+                {
+                    var datosCita = ConsultarDatosCompletosCitas(cita);
+
+                    cita.NombreEspecialidad = datosCita.NombreEspecialidad;
+                    cita.NombreMedico = datosCita.NombreMedico;
+                }
+            }
+            else
+                citas = new List<CitaMedica>();
+
+            return citas;
+        }
+
+        public void RegistrarCalificacionCita(CitaMedica cita)
+        {
+            var objData = GetConnection();
+
+            IDbDataParameter[] parameters = new IDbDataParameter[2]
+            {
+                objData.CreateParameter("@i_id_cita", SqlDbType.Int, 4, cita.IdCita),
+                objData.CreateParameter("@i_id_calificacion", SqlDbType.Int, 4, cita.IdCalificacion)
+            };
+
+            if (cita.FechaProximoControl != null)
+                parameters[3].Value = cita.FechaProximoControl.GetValueOrDefault();
+
+            objData.Insert("RegistrarCalificacionCita", CommandType.StoredProcedure, parameters);
+        }
+
+        #endregion
     }
 }

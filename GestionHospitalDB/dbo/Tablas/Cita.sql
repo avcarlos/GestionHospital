@@ -15,6 +15,8 @@
 	[FechaCreacion]			DATETIME			NULL,
 	[IdUsuarioModificacion]	INT					NULL,
 	[FechaModificacion]		DATETIME			NULL,
+	[IdCalificacion]		INT					NULL,
+	[FechaCalificacion]		DATETIME			NULL,
 	CONSTRAINT [PK_Cita] PRIMARY KEY (IdCita),
 	CONSTRAINT [FK_IdPersona] FOREIGN KEY (IdPaciente) REFERENCES Persona(IdPersona),
 	CONSTRAINT [FK_IdEspecialidadMedico] FOREIGN KEY (IdEspecialidadMedico) REFERENCES EspecialidadMedico(IdEspecialidadMedico),

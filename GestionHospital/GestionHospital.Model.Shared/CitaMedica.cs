@@ -41,6 +41,8 @@ namespace GestionHospital.Model.Shared
 
         public Receta Receta { get; set; }
 
+        public int IdCalificacion { get; set; }
+
         public List<ExamenMedico> Examenes { get; set; }
 
         public CitaMedica()
